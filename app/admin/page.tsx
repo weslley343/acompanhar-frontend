@@ -4,11 +4,10 @@ import { useState, useEffect, SyntheticEvent } from 'react';
 import Image from 'next/image';
 import { useRouter } from 'next/navigation';
 import api from '@/lib/api';
-import { useAuthStore, UserRole } from '@/lib/store';
+import { useAuthStore } from '@/lib/store';
 
-export default function Home() {
-  const { user, isAuthenticated, setAuth, hydrate } = useAuthStore();
-  const [activeTab, setActiveTab] = useState<UserRole>('professional');
+export default function AdminLogin() {
+  const { isAuthenticated, setAuth, hydrate } = useAuthStore();
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
   const [error, setError] = useState('');
@@ -31,12 +30,8 @@ export default function Home() {
     setLoading(true);
 
     try {
-      const loginUrl = activeTab === 'professional' 
-        ? '/auth/professional/login/' 
-        : '/auth/responsible/login/';
-
-      // 1. Request Login
-      const { data: authData } = await api.post(loginUrl, { email, password });
+      // 1. Request Login (Admin endpoint)
+      const { data: authData } = await api.post('/auth/login/', { email, password });
       
       const token = authData.token;
 
@@ -49,7 +44,7 @@ export default function Home() {
       setAuth(userData, token);
       router.push('/home');
     } catch (err: any) {
-      setError('usuário ou senha incorretos');
+      setError('Credenciais de administrador incorretas');
     } finally {
       setLoading(false);
     }
@@ -65,36 +60,12 @@ export default function Home() {
               src="/logo/logo.png" 
               alt="Logo" 
               fill 
-              className="object-contain"
+              className="object-contain grayscale contrast-125"
               priority
             />
           </div>
-          <h1 className="text-3xl font-black tracking-tighter text-white">Acompanhar</h1>
-          <p className="text-white/40 text-sm font-medium">Faça login para continuar</p>
-        </div>
-
-        {/* Tab Selector */}
-        <div className="bg-tertiary p-1.5 rounded-2xl flex gap-1 border border-white/5">
-          <button
-            onClick={() => setActiveTab('professional')}
-            className={`flex-1 py-2.5 rounded-xl text-sm font-bold transition-all ${
-              activeTab === 'professional' 
-                ? 'bg-primary text-secondary shadow-lg' 
-                : 'text-white/60 hover:text-white hover:bg-white/5'
-            }`}
-          >
-            Profissional
-          </button>
-          <button
-            onClick={() => setActiveTab('responsible')}
-            className={`flex-1 py-2.5 rounded-xl text-sm font-bold transition-all ${
-              activeTab === 'responsible' 
-                ? 'bg-primary text-secondary shadow-lg' 
-                : 'text-white/60 hover:text-white hover:bg-white/5'
-            }`}
-          >
-            Responsável
-          </button>
+          <h1 className="text-3xl font-black tracking-tighter text-white">Painel Admin</h1>
+          <p className="text-white/40 text-sm font-medium text-center px-4">Acesso exclusivo para administradores do sistema</p>
         </div>
 
         {/* Form Section */}
@@ -102,7 +73,7 @@ export default function Home() {
           <div className="flex flex-col gap-2">
             <input
               type="email"
-              placeholder="Email"
+              placeholder="Email Admin"
               required
               value={email}
               onChange={(e) => setEmail(e.target.value)}
@@ -110,7 +81,7 @@ export default function Home() {
             />
             <input
               type="password"
-              placeholder="Senha"
+              placeholder="Senha Admin"
               required
               value={password}
               onChange={(e) => setPassword(e.target.value)}
@@ -129,15 +100,21 @@ export default function Home() {
             disabled={loading}
             className="w-full py-4 bg-primary hover:bg-primary/90 text-secondary font-black rounded-2xl transition-all shadow-xl shadow-primary/10 disabled:opacity-50 disabled:cursor-not-allowed"
           >
-            {loading ? 'Entrando...' : 'Entrar'}
+            {loading ? 'Autenticando...' : 'Entrar no Painel'}
           </button>
         </form>
 
         <p className="text-center text-xs text-white/20 font-medium">
-          Acesso restrito a profissionais e responsáveis autorizados.
+          Ao fazer login, você concorda com as políticas de segurança.
         </p>
+        
+        <button 
+          onClick={() => router.push('/')}
+          className="text-white/40 text-xs hover:text-white transition-colors"
+        >
+          Voltar para login comum
+        </button>
       </div>
     </main>
   );
 }
-
