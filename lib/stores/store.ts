@@ -1,23 +1,67 @@
 import { create } from 'zustand';
 
+import { User, UserRole } from '@/types/auth';
+
 interface AuthState {
-  user: any | null;
+  user: User | null;
   token: string | null;
+  refreshToken: string | null;
   isAuthenticated: boolean;
-  setAuth: (user: any, token: string) => void;
+  setAuth: (user: User, token: string, refreshToken?: string) => void;
+  setToken: (token: string) => void;
   logout: () => void;
+  hydrate: () => void;
 }
 
 export const useAuthStore = create<AuthState>((set) => ({
   user: null,
-  token: typeof window !== 'undefined' ? localStorage.getItem('token') : null,
+  token: null,
+  refreshToken: null,
   isAuthenticated: false,
-  setAuth: (user, token) => {
+  
+  setAuth: (user, token, refreshToken) => {
     localStorage.setItem('token', token);
-    set({ user, token, isAuthenticated: true });
+    if (refreshToken) {
+      localStorage.setItem('refreshToken', refreshToken);
+    }
+    localStorage.setItem('user', JSON.stringify(user));
+    set({ user, token, refreshToken: refreshToken || null, isAuthenticated: true });
   },
+
+  setToken: (token) => {
+    localStorage.setItem('token', token);
+    set({ token });
+  },
+  
   logout: () => {
     localStorage.removeItem('token');
-    set({ user: null, token: null, isAuthenticated: false });
+    localStorage.removeItem('refreshToken');
+    localStorage.removeItem('user');
+    set({ user: null, token: null, refreshToken: null, isAuthenticated: false });
   },
+
+  hydrate: () => {
+    const token = localStorage.getItem('token');
+    const refreshToken = localStorage.getItem('refreshToken');
+    const userJson = localStorage.getItem('user');
+    if (token && userJson) {
+      try {
+        const rawUser = JSON.parse(userJson);
+        
+        // Normalização ao carregar do localStorage
+        const user: User = {
+          ...rawUser,
+          full_name: rawUser.full_name || rawUser.name || 'Usuário',
+          image_url: rawUser.image_url || null,
+          description: rawUser.description || null,
+        };
+
+        set({ token, refreshToken, user, isAuthenticated: true });
+      } catch (e) {
+        localStorage.removeItem('token');
+        localStorage.removeItem('refreshToken');
+        localStorage.removeItem('user');
+      }
+    }
+  }
 }));

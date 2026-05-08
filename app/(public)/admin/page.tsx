@@ -1,28 +1,18 @@
 'use client';
 
-import { useState, useEffect, SyntheticEvent } from 'react';
+import { useState, SyntheticEvent } from 'react';
 import Image from 'next/image';
 import { useRouter } from 'next/navigation';
-import api from '@/lib/api';
-import { useAuthStore } from '@/lib/store';
+import { authApi } from '@/lib/api/auth';
+import { useAuthStore } from '@/lib/stores/store';
 
 export default function AdminLogin() {
-  const { isAuthenticated, setAuth, hydrate } = useAuthStore();
+  const { setAuth } = useAuthStore();
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
   const [error, setError] = useState('');
   const [loading, setLoading] = useState(false);
   const router = useRouter();
-
-  useEffect(() => {
-    hydrate();
-  }, [hydrate]);
-
-  useEffect(() => {
-    if (isAuthenticated) {
-      router.push('/home');
-    }
-  }, [isAuthenticated, router]);
 
   const handleLogin = async (e: SyntheticEvent) => {
     e.preventDefault();
@@ -30,21 +20,25 @@ export default function AdminLogin() {
     setLoading(true);
 
     try {
-      // 1. Request Login (Admin endpoint)
-      const { data: authData } = await api.post('/auth/login/', { email, password });
+      // 1. Request Login
+      const authData = await authApi.login({ email, password }, 'admin');
       
+      if (!authData || !authData.token) {
+        throw new Error('Resposta de login inválida');
+      }
+
       const token = authData.token;
 
       // 2. Request Me Data
-      const { data: userData } = await api.get('/auth/me/', {
-        headers: { Authorization: `Bearer ${token}` }
-      });
+      const userData = await authApi.getMe(token);
 
       // 3. Set Auth
-      setAuth(userData, token);
+      setAuth(userData, token, authData.refreshToken);
       router.push('/home');
     } catch (err: any) {
-      setError('Credenciais de administrador incorretas');
+      console.error('Admin login error:', err);
+      const message = err.response?.data?.error || err.message || 'Credenciais de administrador incorretas';
+      setError(typeof message === 'string' ? message : 'Credenciais de administrador incorretas');
     } finally {
       setLoading(false);
     }
