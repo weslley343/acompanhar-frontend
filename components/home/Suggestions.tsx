@@ -1,17 +1,19 @@
 'use client';
 
 import { useState, useEffect } from 'react';
-import { 
-  RiLightbulbLine, 
-  RiSendPlane2Line, 
-  RiHistoryLine, 
-  RiTimeLine, 
-  RiCheckboxCircleLine, 
+import {
+  RiLightbulbLine,
+  RiSendPlane2Line,
+  RiHistoryLine,
+  RiTimeLine,
+  RiCheckboxCircleLine,
   RiDeleteBin7Line,
   RiQuestionAnswerLine,
   RiUserStarLine,
   RiChat1Line,
-  RiGlobalLine
+  RiGlobalLine,
+  RiArrowLeftSLine,
+  RiArrowRightSLine
 } from 'react-icons/ri';
 import { suggestionService } from '@/lib/api/suggestions';
 import { Suggestion } from '@/types/suggestion';
@@ -31,20 +33,28 @@ export default function Suggestions() {
   const [submitting, setSubmitting] = useState(false);
   const [error, setError] = useState<string | null>(null);
 
+  // Pagination state
+  const [page, setPage] = useState(1);
+  const [totalPages, setTotalPages] = useState(1);
+
   // Admin response state
   const [respondingTo, setRespondingTo] = useState<number | null>(null);
   const [adminResponse, setAdminResponse] = useState('');
 
-  const fetchSuggestions = async () => {
+  const fetchSuggestions = async (pageToFetch = 1) => {
     try {
       setLoading(true);
       if (activeTab === 'all' || user?.role === 'admin') {
-        const response = await suggestionService.getSuggestions();
+        const response = await suggestionService.getSuggestions(pageToFetch, 10);
         setSuggestions(Array.isArray(response.data) ? response.data : (Array.isArray(response) ? response : []));
+        if (response.meta) {
+          setTotalPages(response.meta.totalPages || 1);
+        }
       } else {
         const response: any = await suggestionService.getMySuggestions();
         const data = response.data || response;
         setSuggestions(Array.isArray(data) ? data : []);
+        setTotalPages(1);
       }
     } catch (err) {
       console.error('Failed to fetch suggestions', err);
@@ -55,8 +65,15 @@ export default function Suggestions() {
   };
 
   useEffect(() => {
-    fetchSuggestions();
+    setPage(1);
+    fetchSuggestions(1);
   }, [user, activeTab]);
+
+  const handlePageChange = (newPage: number) => {
+    if (newPage < 1 || newPage > totalPages) return;
+    setPage(newPage);
+    fetchSuggestions(newPage);
+  };
 
   const handleSubmit = async () => {
     if (content.length < 5) {
@@ -104,7 +121,7 @@ export default function Suggestions() {
     <div className="w-full max-w-2xl mx-auto space-y-8 animate-fade-in-up">
       <div className="flex items-center justify-between">
         <div>
-          <h2 className="text-3xl font-black text-white tracking-tighter uppercase">FAC</h2>
+          <h2 className="text-3xl font-black text-white tracking-tighter uppercase">FAQ</h2>
           <p className="text-white/40 text-sm font-medium">Feedback e Apoio Clínico para melhoria do sistema.</p>
         </div>
         <div className="w-14 h-14 rounded-2xl bg-primary/10 flex items-center justify-center text-primary border border-primary/20 shadow-lg shadow-primary/5">
@@ -118,19 +135,19 @@ export default function Suggestions() {
           <div className="absolute top-0 right-0 p-8 text-primary/5 -rotate-12 translate-x-4 -translate-y-4">
             <RiChat1Line size={120} />
           </div>
-          
+
           <div className="relative space-y-4">
-            <textarea 
+            <textarea
               rows={4}
               value={content}
               onChange={(e) => setContent(e.target.value)}
               className="w-full bg-white/5 border border-white/10 rounded-3xl py-6 px-6 text-white focus:outline-none focus:ring-2 focus:ring-primary/50 focus:border-primary/50 transition-all resize-none placeholder:text-white/20"
               placeholder="Descreva seu feedback, dúvida ou relate um problema clínico..."
             />
-            
+
             {error && <p className="text-red-400 text-xs font-bold pl-2 uppercase tracking-widest">{error}</p>}
 
-            <button 
+            <button
               onClick={handleSubmit}
               disabled={submitting || !content.trim()}
               className="w-full py-5 bg-primary text-secondary-dark font-black rounded-2xl transition-all shadow-xl shadow-primary/20 flex items-center justify-center gap-2 group active:scale-95 disabled:opacity-50 disabled:pointer-events-none"
@@ -169,16 +186,46 @@ export default function Suggestions() {
           </div>
           {loading && <div className="w-4 h-4 border-2 border-primary border-t-transparent rounded-full animate-spin self-center md:self-auto" />}
         </div>
-        
+
+        {/* Pagination UI - TOP */}
+        {totalPages > 1 && (
+          <div className="flex items-center justify-center gap-4 py-2 border-y border-white/5">
+            <button
+              onClick={() => handlePageChange(page - 1)}
+              disabled={page === 1 || loading}
+              className="p-2 rounded-xl bg-white/5 border border-white/5 text-white/40 hover:text-white hover:bg-white/10 disabled:opacity-20 disabled:pointer-events-none transition-all"
+            >
+              <RiArrowLeftSLine size={20} />
+            </button>
+            
+            <div className="flex items-center gap-2">
+              <span className="text-[10px] font-black text-primary px-3 py-1 bg-primary/10 rounded-lg">
+                PÁGINA {page}
+              </span>
+              <span className="text-[10px] font-bold text-white/20 uppercase tracking-widest">
+                DE {totalPages}
+              </span>
+            </div>
+
+            <button
+              onClick={() => handlePageChange(page + 1)}
+              disabled={page === totalPages || loading}
+              className="p-2 rounded-xl bg-white/5 border border-white/5 text-white/40 hover:text-white hover:bg-white/10 disabled:opacity-20 disabled:pointer-events-none transition-all"
+            >
+              <RiArrowRightSLine size={20} />
+            </button>
+          </div>
+        )}
+
         <div className="space-y-4">
           {suggestions.length === 0 && !loading ? (
             <div className="text-center py-12 bg-white/5 border border-dashed border-white/10 rounded-[2rem]">
-              <p className="text-white/20 text-xs font-bold uppercase tracking-widest">Nenhum registro no FAC encontrado</p>
+              <p className="text-white/20 text-xs font-bold uppercase tracking-widest">Nenhum registro no FAQ encontrado</p>
             </div>
           ) : (
             suggestions.map((suggestion) => (
-              <div 
-                key={suggestion.id} 
+              <div
+                key={suggestion.id}
                 className={cn(
                   "bg-tertiary/40 border border-white/5 p-6 rounded-[2rem] space-y-4 transition-all hover:border-white/10",
                   suggestion.status === 'responded' ? "border-l-4 border-l-green-500/50" : "border-l-4 border-l-yellow-500/50"
@@ -195,7 +242,7 @@ export default function Suggestions() {
                     <p className="text-white/80 text-sm leading-relaxed">{suggestion.content}</p>
                   </div>
                   {(user?.role === 'admin' || activeTab === 'me') && (
-                    <button 
+                    <button
                       onClick={() => handleDelete(suggestion.id)}
                       className="p-2 text-white/10 hover:text-red-400 transition-colors"
                     >
@@ -214,31 +261,31 @@ export default function Suggestions() {
                     <p className="text-green-500/80 text-sm italic">"{suggestion.response}"</p>
                   </div>
                 ) : user?.role === 'admin' && respondingTo !== suggestion.id && (
-                  <button 
+                  <button
                     onClick={() => setRespondingTo(suggestion.id)}
                     className="text-[10px] font-black text-primary uppercase tracking-widest hover:underline"
                   >
-                    Responder ao FAC
+                    Responder ao FAQ
                   </button>
                 )}
 
                 {/* Admin response input */}
                 {respondingTo === suggestion.id && (
                   <div className="space-y-3 pt-2">
-                    <textarea 
+                    <textarea
                       value={adminResponse}
                       onChange={(e) => setAdminResponse(e.target.value)}
                       className="w-full bg-secondary border border-white/10 rounded-2xl p-4 text-sm text-white focus:outline-none focus:border-primary/50"
                       placeholder="Sua resposta..."
                     />
                     <div className="flex gap-2">
-                      <button 
+                      <button
                         onClick={() => handleRespond(suggestion.id)}
                         className="px-4 py-2 bg-primary text-secondary-dark text-[10px] font-black rounded-xl uppercase tracking-widest"
                       >
                         Enviar Resposta
                       </button>
-                      <button 
+                      <button
                         onClick={() => setRespondingTo(null)}
                         className="px-4 py-2 bg-white/5 text-white/40 text-[10px] font-black rounded-xl uppercase tracking-widest"
                       >
@@ -257,7 +304,7 @@ export default function Suggestions() {
                       </span>
                     </div>
                   </div>
-                  
+
                   <div className={cn(
                     "px-3 py-1 rounded-full flex items-center gap-1.5",
                     suggestion.status === 'responded' ? "bg-green-500/10 text-green-400" : "bg-yellow-500/10 text-yellow-400"

@@ -38,7 +38,7 @@ export interface SuggestionListResponse {
   meta: {
     total: number;
     page: number;
-    lastPage: number;
+    totalPages: number;
     limit: number;
   };
 }
