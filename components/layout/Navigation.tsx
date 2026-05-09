@@ -25,17 +25,17 @@ export interface NavItem {
 export const ROLE_MENUS: Record<string, NavItem[]> = {
   admin: [
     { id: 'profile', label: 'Perfil', icon: RiUserSettingsLine },
-    { id: 'suggestions', label: 'Sugestões', icon: RiLightbulbFlashLine },
+    { id: 'suggestions', label: 'FAC', icon: RiLightbulbFlashLine },
   ],
   professional: [
     { id: 'users', label: 'Pacientes', icon: RiGroupLine },
     { id: 'profile', label: 'Perfil', icon: RiUserSettingsLine },
-    { id: 'suggestions', label: 'Sugestões', icon: RiLightbulbFlashLine },
+    { id: 'suggestions', label: 'FAC', icon: RiLightbulbFlashLine },
   ],
   responsible: [
     { id: 'users', label: 'Pacientes', icon: RiGroupLine },
     { id: 'profile', label: 'Meu Perfil', icon: RiUserSettingsLine },
-    { id: 'suggestions', label: 'Sugestões', icon: RiLightbulbFlashLine },
+    { id: 'suggestions', label: 'FAC', icon: RiLightbulbFlashLine },
   ],
 };
 

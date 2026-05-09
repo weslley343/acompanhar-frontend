@@ -6,8 +6,8 @@ export const authApi = {
    * Performs login based on user role
    */
   login: async (credentials: AuthCredentials, role: UserRole): Promise<LoginResponse> => {
-    const loginUrl = role === 'professional' 
-      ? '/auth/professional/login/' 
+    const loginUrl = role === 'professional'
+      ? '/auth/professional/login/'
       : role === 'responsible'
         ? '/auth/responsible/login/'
         : '/auth/login/'; // admin login
@@ -22,7 +22,7 @@ export const authApi = {
   getMe: async (token?: string): Promise<User> => {
     const config = token ? { headers: { Authorization: `Bearer ${token}` } } : {};
     const { data } = await api.get<any>('/auth/me/', config);
-    
+
     // Normalização: Admins usam 'name', outros 'full_name'.
     // Padronizamos tudo para 'full_name' no frontend.
     const normalizedUser: User = {
@@ -31,7 +31,7 @@ export const authApi = {
       image_url: data.image_url || null,
       description: data.description || null,
     };
-    
+
     return normalizedUser;
   },
 
@@ -49,7 +49,7 @@ export const authApi = {
   updateProfile: async (id: string, role: UserRole, data: Partial<User>): Promise<User> => {
     const endpoint = role === 'professional' ? `/professionals/${id}` : `/responsibles/${id}`;
     const { data: responseData } = await api.patch<any>(endpoint, data);
-    
+
     const normalizedUser: User = {
       ...responseData,
       role: responseData.role || role, // Preserve role if backend doesn't return it
@@ -57,7 +57,7 @@ export const authApi = {
       image_url: responseData.image_url || null,
       description: responseData.description || null,
     };
-    
+
     return normalizedUser;
   }
 };

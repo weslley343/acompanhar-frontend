@@ -113,89 +113,91 @@ export default function ProfileEdit() {
       </div>
 
       <form onSubmit={handleSubmit} className="space-y-6">
-        {/* Avatar Selection */}
-        <div className="bg-tertiary border border-white/5 p-8 rounded-3xl space-y-6">
-          <div className="flex items-center gap-3 text-primary mb-2">
-            <RiImageAddLine size={20} />
-            <h3 className="text-sm font-black uppercase tracking-widest">Foto de Perfil</h3>
-          </div>
-
-          <div className="flex flex-col items-center gap-8">
-            <div className="relative group">
-              <div className="absolute inset-0 bg-primary/20 rounded-3xl blur-2xl opacity-0 group-hover:opacity-100 transition-opacity duration-500" />
-              <div className="relative w-32 h-32 rounded-3xl bg-secondary border-2 border-white/10 overflow-hidden flex items-center justify-center shadow-2xl group-hover:border-primary/30 transition-colors">
-                {imageUrl ? (
-                  <Image
-                    src={getImageUrl(imageUrl) || ''}
-                    alt="Preview"
-                    fill
-                    sizes="(max-width: 768px) 128px, 128px"
-                    className="object-cover"
-                  />
-                ) : (
-                  <RiUser3Line size={48} className="text-white/10" />
-                )}
-
-                {imageUrl && (
-                  <button
-                    type="button"
-                    onClick={() => setImageUrl('')}
-                    className="absolute top-2 right-2 p-2 bg-red-500 text-white rounded-lg shadow-lg hover:bg-red-600 transition-all duration-300 z-20 hover:scale-110 active:scale-95"
-                    title="Remover Foto"
-                  >
-                    <RiDeleteBinLine size={16} />
-                  </button>
-                )}
-              </div>
+        {/* Avatar Selection - Hidden for Admins */}
+        {user.role !== 'admin' && (
+          <div className="bg-tertiary border border-white/5 p-8 rounded-3xl space-y-6">
+            <div className="flex items-center gap-3 text-primary mb-2">
+              <RiImageAddLine size={20} />
+              <h3 className="text-sm font-black uppercase tracking-widest">Foto de Perfil</h3>
             </div>
 
-            <div className="w-full relative group/carousel">
-              {/* Navigation Arrows */}
-              <button
-                type="button"
-                onClick={() => scroll('left')}
-                className="absolute left-0 top-1/2 -translate-y-1/2 -translate-x-2 z-10 p-2 bg-secondary/80 backdrop-blur-md border border-white/10 rounded-full text-white/40 hover:text-primary hover:border-primary/30 transition-all opacity-0 group-hover/carousel:opacity-100"
-              >
-                <RiArrowLeftSLine size={20} />
-              </button>
-
-              <button
-                type="button"
-                onClick={() => scroll('right')}
-                className="absolute right-0 top-1/2 -translate-y-1/2 translate-x-2 z-10 p-2 bg-secondary/80 backdrop-blur-md border border-white/10 rounded-full text-white/40 hover:text-primary hover:border-primary/30 transition-all opacity-0 group-hover/carousel:opacity-100"
-              >
-                <RiArrowRightSLine size={20} />
-              </button>
-
-              <div
-                ref={scrollContainerRef}
-                className="flex gap-4 overflow-x-auto no-scrollbar scroll-smooth px-2 py-2"
-              >
-                {getAvailableAvatars().map((avatar, idx) => (
-                  <button
-                    key={idx}
-                    type="button"
-                    onClick={() => setImageUrl(avatar)}
-                    className={cn(
-                      "relative min-w-[80px] h-20 rounded-xl bg-secondary border transition-all duration-300 overflow-hidden shrink-0",
-                      imageUrl === avatar
-                        ? "border-primary ring-4 ring-primary/20 scale-110 z-10"
-                        : "border-white/5 hover:border-white/20 grayscale hover:grayscale-0"
-                    )}
-                  >
+            <div className="flex flex-col items-center gap-8">
+              <div className="relative group">
+                <div className="absolute inset-0 bg-primary/20 rounded-3xl blur-2xl opacity-0 group-hover:opacity-100 transition-opacity duration-500" />
+                <div className="relative w-32 h-32 rounded-3xl bg-secondary border-2 border-white/10 overflow-hidden flex items-center justify-center shadow-2xl group-hover:border-primary/30 transition-colors">
+                  {imageUrl ? (
                     <Image
-                      src={getImageUrl(avatar) || ''}
-                      alt="Avatar Option"
+                      src={getImageUrl(imageUrl) || ''}
+                      alt="Preview"
                       fill
-                      sizes="(max-width: 768px) 80px, 80px"
+                      sizes="(max-width: 768px) 128px, 128px"
                       className="object-cover"
                     />
-                  </button>
-                ))}
+                  ) : (
+                    <RiUser3Line size={48} className="text-white/10" />
+                  )}
+
+                  {imageUrl && (
+                    <button
+                      type="button"
+                      onClick={() => setImageUrl('')}
+                      className="absolute top-2 right-2 p-2 bg-red-500 text-white rounded-lg shadow-lg hover:bg-red-600 transition-all duration-300 z-20 hover:scale-110 active:scale-95"
+                      title="Remover Foto"
+                    >
+                      <RiDeleteBinLine size={16} />
+                    </button>
+                  )}
+                </div>
+              </div>
+
+              <div className="w-full relative group/carousel">
+                {/* Navigation Arrows */}
+                <button
+                  type="button"
+                  onClick={() => scroll('left')}
+                  className="absolute left-0 top-1/2 -translate-y-1/2 -translate-x-2 z-10 p-2 bg-secondary/80 backdrop-blur-md border border-white/10 rounded-full text-white/40 hover:text-primary hover:border-primary/30 transition-all opacity-0 group-hover/carousel:opacity-100"
+                >
+                  <RiArrowLeftSLine size={20} />
+                </button>
+
+                <button
+                  type="button"
+                  onClick={() => scroll('right')}
+                  className="absolute right-0 top-1/2 -translate-y-1/2 translate-x-2 z-10 p-2 bg-secondary/80 backdrop-blur-md border border-white/10 rounded-full text-white/40 hover:text-primary hover:border-primary/30 transition-all opacity-0 group-hover/carousel:opacity-100"
+                >
+                  <RiArrowRightSLine size={20} />
+                </button>
+
+                <div
+                  ref={scrollContainerRef}
+                  className="flex gap-4 overflow-x-auto no-scrollbar scroll-smooth px-2 py-2"
+                >
+                  {getAvailableAvatars().map((avatar, idx) => (
+                    <button
+                      key={idx}
+                      type="button"
+                      onClick={() => setImageUrl(avatar)}
+                      className={cn(
+                        "relative min-w-[80px] h-20 rounded-xl bg-secondary border transition-all duration-300 overflow-hidden shrink-0",
+                        imageUrl === avatar
+                          ? "border-primary ring-4 ring-primary/20 scale-110 z-10"
+                          : "border-white/5 hover:border-white/20 grayscale hover:grayscale-0"
+                      )}
+                    >
+                      <Image
+                        src={getImageUrl(avatar) || ''}
+                        alt="Avatar Option"
+                        fill
+                        sizes="(max-width: 768px) 80px, 80px"
+                        className="object-cover"
+                      />
+                    </button>
+                  ))}
+                </div>
               </div>
             </div>
           </div>
-        </div>
+        )}
 
         <div className="bg-tertiary border border-white/5 p-8 rounded-3xl space-y-6">
           <div className="space-y-2">
