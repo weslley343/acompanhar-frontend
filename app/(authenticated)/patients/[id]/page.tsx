@@ -55,20 +55,6 @@ function PatientDetailContent() {
   const [unlinking, setUnlinking] = useState(false);
 
   useEffect(() => {
-    // 1. Add a dummy entry to the history stack to "trap" the back button
-    window.history.pushState(null, '', window.location.href);
-
-    const handlePopState = () => {
-      // 2. When the user clicks back, they pop the dummy entry
-      // we then force redirect them to /home
-      router.push('/home');
-    };
-
-    window.addEventListener('popstate', handlePopState);
-    return () => window.removeEventListener('popstate', handlePopState);
-  }, [router]);
-
-  useEffect(() => {
     const fetchPatient = async () => {
       try {
         const data = await clientService.getClientById(id as string);
@@ -160,7 +146,7 @@ function PatientDetailContent() {
           <p className="text-white/40 max-w-xs mx-auto">{error || 'Paciente não encontrado.'}</p>
         </div>
         <button
-          onClick={() => router.push('/home')}
+          onClick={() => router.back()}
           className="px-8 py-3 bg-white/5 hover:bg-white/10 text-white font-bold rounded-2xl transition-all"
         >
           Voltar
@@ -178,7 +164,7 @@ function PatientDetailContent() {
       <header className="h-20 flex items-center px-6 sticky top-0 bg-secondary/80 backdrop-blur-xl z-50 border-b border-white/5">
         <div className="max-w-4xl w-full mx-auto flex items-center gap-4">
           <button
-            onClick={() => router.push('/home')}
+            onClick={() => router.back()}
             className="p-3 bg-white/5 hover:bg-white/10 rounded-2xl transition-all active:scale-95"
           >
             <RiArrowLeftLine size={24} />

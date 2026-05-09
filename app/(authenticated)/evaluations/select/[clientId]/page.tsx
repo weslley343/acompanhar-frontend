@@ -105,7 +105,7 @@ export default function ScaleSelection() {
           {scales.map((scale) => (
             <button
               key={scale.id}
-              onClick={() => router.replace(`/evaluations/create/${clientId}/${scale.id}`)}
+              onClick={() => router.push(`/evaluations/create/${clientId}/${scale.id}`)}
               className="relative group overflow-hidden bg-tertiary border border-white/5 rounded-[3rem] p-8 text-left transition-all hover:scale-[1.02] hover:border-primary/30 active:scale-[0.98] shadow-2xl shadow-black/20"
             >
               {/* Background Glow */}

@@ -147,8 +147,7 @@ export default function ScaleFilling() {
       <SuccessModal 
         isOpen={!!success} 
         message={success || ''} 
-        redirectUrl={`/patients/${clientId}`} 
-        buttonText="Voltar ao Perfil"
+        redirectUrl="/home" 
       />
 
       {/* Header & Progress */}
