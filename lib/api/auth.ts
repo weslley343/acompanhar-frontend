@@ -41,5 +41,23 @@ export const authApi = {
   refresh: async (refreshToken: string): Promise<{ token: string }> => {
     const { data } = await api.post<{ token: string }>('/auth/refresh/', { refreshToken });
     return data;
+  },
+
+  /**
+   * Updates the current authenticated user profile
+   */
+  updateProfile: async (id: string, role: UserRole, data: Partial<User>): Promise<User> => {
+    const endpoint = role === 'professional' ? `/professionals/${id}` : `/responsibles/${id}`;
+    const { data: responseData } = await api.patch<any>(endpoint, data);
+    
+    const normalizedUser: User = {
+      ...responseData,
+      role: responseData.role || role, // Preserve role if backend doesn't return it
+      full_name: responseData.full_name || responseData.name || 'Usuário',
+      image_url: responseData.image_url || null,
+      description: responseData.description || null,
+    };
+    
+    return normalizedUser;
   }
 };

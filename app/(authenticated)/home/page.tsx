@@ -16,8 +16,9 @@ export default function HomePage() {
   // Ajusta a aba inicial baseada no papel do usuário e no menu configurado
   useEffect(() => {
     if (user) {
-      const allowedTabs = ROLE_MENUS[user.role].map(item => item.id);
-      if (!allowedTabs.includes(activeTab)) {
+      const menu = ROLE_MENUS[user.role] || [];
+      const allowedTabs = menu.map((item) => item.id);
+      if (allowedTabs.length > 0 && !allowedTabs.includes(activeTab)) {
         setActiveTab(allowedTabs[0]);
       }
     }
@@ -28,9 +29,10 @@ export default function HomePage() {
   }
 
   const renderContent = () => {
-    // Proteção extra: se a aba atual não estiver no menu do usuário, não renderiza conteúdo indevido
-    const allowedTabs = ROLE_MENUS[user.role].map(item => item.id);
-    if (!allowedTabs.includes(activeTab)) {
+    const menu = ROLE_MENUS[user?.role || ''] || [];
+    const allowedTabs = menu.map((item) => item.id);
+    
+    if (user && allowedTabs.length > 0 && !allowedTabs.includes(activeTab)) {
       return null;
     }
 

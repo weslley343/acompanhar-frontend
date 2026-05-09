@@ -6,7 +6,7 @@ export interface Client {
   identifier: string;
   code: string | null;
   full_name: string;
-  birthdate: string;
+  birthdate: string | null;
   gender: 'male' | 'female' | 'unspecified';
   description: string | null;
   creator_fk: string | null;
@@ -35,11 +35,47 @@ export interface ClientListResponse {
   meta: PaginationMeta;
 }
 
+export interface Responsible {
+  id: string;
+  identifier: string;
+  full_name: string;
+  email: string;
+  image_url: string | null;
+}
+
+export interface Professional {
+  id: string;
+  identifier: string;
+  full_name: string;
+  email: string;
+  image_url: string | null;
+  specialty: string;
+}
+
+export interface ResponsibleListResponse {
+  data: Responsible[];
+  meta: PaginationMeta;
+}
+
+export interface ProfessionalListResponse {
+  data: Professional[];
+  meta: PaginationMeta;
+}
+
 export interface CreateClientDTO {
   identifier?: string;
   full_name: string;
   birthdate: string;
   gender: 'male' | 'female' | 'unspecified';
+  description?: string;
+  image_url?: string;
+}
+
+export interface UpdateClientDTO {
+  identifier?: string;
+  full_name?: string;
+  birthdate?: string;
+  gender?: 'male' | 'female' | 'unspecified';
   description?: string;
   image_url?: string;
 }

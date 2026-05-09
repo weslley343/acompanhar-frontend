@@ -10,13 +10,15 @@ interface SuccessModalProps {
   message: string;
   redirectUrl: string;
   autoRedirectTime?: number;
+  buttonText?: string;
 }
 
 export default function SuccessModal({ 
   isOpen, 
   message, 
   redirectUrl, 
-  autoRedirectTime = 3000 
+  autoRedirectTime = 3000,
+  buttonText = "Ir para Home"
 }: SuccessModalProps) {
   const router = useRouter();
   const [countdown, setCountdown] = useState(autoRedirectTime / 1000);
@@ -25,7 +27,7 @@ export default function SuccessModal({
     if (!isOpen) return;
 
     const timer = setTimeout(() => {
-      router.push(redirectUrl);
+      router.replace(redirectUrl);
     }, autoRedirectTime);
 
     const interval = setInterval(() => {
@@ -84,10 +86,10 @@ export default function SuccessModal({
 
         <div className="w-full pt-4 space-y-4">
           <button 
-            onClick={() => router.push(redirectUrl)}
+            onClick={() => router.replace(redirectUrl)}
             className="w-full py-4 bg-primary text-secondary-dark rounded-2xl font-bold flex items-center justify-center gap-2 hover:scale-105 active:scale-95 transition-all shadow-lg shadow-primary/20 group"
           >
-            Ir para Home
+            {buttonText}
             <RiArrowRightLine size={20} className="group-hover:translate-x-1 transition-transform" />
           </button>
           

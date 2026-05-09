@@ -1,10 +1,13 @@
 'use client';
 
-import { RiGroupLine, RiUserSettingsLine, RiLightbulbFlashLine } from 'react-icons/ri';
+import { RiGroupLine, RiUserSettingsLine, RiLightbulbFlashLine, RiLogoutBoxLine } from 'react-icons/ri';
+import { useRouter } from 'next/navigation';
 import { cn } from '@/lib/utils';
 import Image from 'next/image';
 import { useAuthStore } from '@/lib/stores/store';
 import { UserRole } from '@/types/auth';
+
+import { IconType } from 'react-icons';
 
 export type TabType = 'users' | 'profile' | 'suggestions';
 
@@ -16,10 +19,10 @@ interface NavigationProps {
 export interface NavItem {
   id: TabType;
   label: string;
-  icon: any;
+  icon: IconType;
 }
 
-export const ROLE_MENUS: Record<UserRole, NavItem[]> = {
+export const ROLE_MENUS: Record<string, NavItem[]> = {
   admin: [
     { id: 'profile', label: 'Perfil', icon: RiUserSettingsLine },
     { id: 'suggestions', label: 'Sugestões', icon: RiLightbulbFlashLine },
@@ -36,10 +39,15 @@ export const ROLE_MENUS: Record<UserRole, NavItem[]> = {
   ],
 };
 
-export default function Navigation({ activeTab, onTabChange }: NavigationProps) {
-  const { user } = useAuthStore();
+// Aliases para compatibilidade
+ROLE_MENUS.professionals = ROLE_MENUS.professional;
+ROLE_MENUS.responsibles = ROLE_MENUS.responsible;
 
-  const menuItems = user ? ROLE_MENUS[user.role] : [];
+export default function Navigation({ activeTab, onTabChange }: NavigationProps) {
+  const { user, logout } = useAuthStore();
+  const router = useRouter();
+
+  const menuItems = user ? (ROLE_MENUS[user.role] || []) : [];
 
   return (
     <>
@@ -68,8 +76,17 @@ export default function Navigation({ activeTab, onTabChange }: NavigationProps) 
             ))}
           </div>
 
-          <div className="w-24 flex justify-end">
-            {/* Profile trigger or search could go here */}
+          <div className="flex items-center gap-4">
+            <button
+              onClick={() => {
+                logout();
+                router.push('/login');
+              }}
+              title="Sair do sistema"
+              className="p-3 bg-red-500/10 hover:bg-red-500 text-red-500 hover:text-white rounded-xl transition-all border border-red-500/20 shadow-lg shadow-red-500/5 group"
+            >
+              <RiLogoutBoxLine size={20} className="group-hover:-translate-x-1 transition-transform" />
+            </button>
           </div>
         </div>
       </nav>
@@ -100,6 +117,16 @@ export default function Navigation({ activeTab, onTabChange }: NavigationProps) 
             </button>
           );
         })}
+
+        <button
+          onClick={() => {
+            logout();
+            router.push('/login');
+          }}
+          className="relative flex flex-col items-center justify-center text-red-500/40 hover:text-red-500 transition-all duration-300 w-full h-full group"
+        >
+          <RiLogoutBoxLine size={24} className="group-active:scale-90 transition-transform" />
+        </button>
       </nav>
     </>
   );

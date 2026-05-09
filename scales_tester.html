@@ -1,0 +1,270 @@
+<!doctype html>
+<html lang="pt-BR">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width,initial-scale=1" />
+  <title>Testador de Escalas - Acompanha</title>
+  <style>
+    :root{font-family:Inter, system-ui, -apple-system, "Segoe UI", Roboto, "Helvetica Neue", Arial;}
+    body{margin:0;padding:16px;background:#0f172a;color:#e6eef8}
+    .container{max-width:1100px;margin:0 auto}
+    header{display:flex;gap:12px;align-items:center;margin-bottom:18px}
+    h1{font-size:20px;margin:0}
+    .controls{display:flex;gap:8px;align-items:center}
+    input,select,button,textarea{font-size:14px;padding:8px;border-radius:8px;border:1px solid rgba(255,255,255,0.06);background:#0b1220;color:inherit}
+    button{cursor:pointer}
+    button:hover{background:rgba(255,255,255,0.05)}
+    .panel{background:#071029;padding:12px;border-radius:12px;box-shadow:0 6px 18px rgba(3,7,18,0.6);margin-bottom:12px}
+    .flex{display:flex;gap:12px}
+    .col{flex:1}
+    .scales-list{display:flex;flex-direction:column;gap:8px}
+    .scale-item{padding:10px;border-radius:10px;background:linear-gradient(90deg, rgba(255,255,255,0.02), rgba(255,255,255,0));display:flex;justify-content:space-between;align-items:center}
+    .scale-meta{display:flex;gap:12px;align-items:center}
+    .dot{width:36px;height:36px;border-radius:8px;display:flex;align-items:center;justify-content:center;color:#000; font-weight:700}
+    .questions{display:flex;flex-direction:column;gap:14px}
+    .question{background:#041226;padding:10px;border-radius:10px}
+    .items{display:flex;flex-wrap:wrap;gap:8px;margin-top:8px}
+    .item{padding:8px 10px;border-radius:8px;background:#07213a;cursor:pointer}
+    .item.selected{outline:2px solid #66d9ef}
+    pre{white-space:pre-wrap;word-break:break-word;background:#021022;padding:12px;border-radius:8px;max-height:400px;overflow-y:auto}
+    .muted{opacity:0.7;font-size:13px}
+    footer{margin-top:12px;color:#99b3c8;font-size:12px}
+  </style>
+</head>
+<body>
+  <div class="container">
+    <header>
+      <div>
+        <h1>Testador de Escalas - Acompanha</h1>
+        <div class="muted">Gerencie escalas e envie avaliações (POST /evaluations)</div>
+      </div>
+      <div style="margin-left:auto" class="controls">
+        <input id="baseUrl" placeholder="Base URL (ex: http://localhost:3000)" style="width:300px" value="http://localhost:3000" />
+        <input id="token" placeholder="Bearer token" style="width:300px" />
+        <button id="loadScalesBtn">Carregar escalas</button>
+      </div>
+    </header>
+
+    <div class="flex">
+      <div class="col panel">
+        <h3>Escalas (Formulários)</h3>
+        <div id="scalesList" class="scales-list muted">Nenhuma escala carregada.</div>
+      </div>
+
+      <div class="col panel">
+        <h3>Detalhes da Escala</h3>
+        <div id="scaleDetails" class="muted">Selecione uma escala à esquerda.</div>
+        <div id="questionsContainer"></div>
+        <div style="margin-top:12px;display:flex;gap:8px;align-items:center">
+          <input id="clientFk" placeholder="ID do Cliente (UUID)" style="width:320px" />
+          <button id="submitBtn">Enviar Avaliação</button>
+          <button id="showPayloadBtn">Mostrar payload</button>
+        </div>
+      </div>
+    </div>
+
+    <div class="panel">
+      <h3>Resposta / Debug</h3>
+      <pre id="responseArea">Nada ainda.</pre>
+    </div>
+
+    <footer>Observação: Certifique-se que o backend permite CORS para este domínio. O token deve ser de um profissional ou admin.</footer>
+  </div>
+
+  <script>
+    const $ = id => document.getElementById(id)
+    let currentScale = null
+
+    function showResponse(obj){
+      try{ $('responseArea').textContent = JSON.stringify(obj, null, 2) }
+      catch(e){ $('responseArea').textContent = String(obj) }
+    }
+
+    function getAuthHeaders(){
+      const token = $('token').value.trim()
+      const headers = { 'Content-Type':'application/json' }
+      if(token) headers['Authorization'] = 'Bearer ' + token
+      return headers
+    }
+
+    function apiFetch(path, opts={}){
+      const base = $('baseUrl').value.trim() || ''
+      const url = base.replace(/\/$/, '') + path
+      opts.headers = Object.assign({}, opts.headers || {}, getAuthHeaders())
+      return fetch(url, opts)
+        .then(async res => {
+          const text = await res.text()
+          let body = text
+          try{ body = JSON.parse(text) }catch(e){}
+          if(!res.ok) {
+            console.error('API Error:', res.status, body);
+            throw {status: res.status, body}
+          }
+          return body
+        })
+    }
+
+    async function loadScales(){
+      $('scalesList').textContent = 'Carregando...'
+      try{
+        const scales = await apiFetch('/scales')
+        if(Array.isArray(scales)){
+          renderScales(scales)
+        } else {
+          $('scalesList').textContent = 'Resposta inesperada: ver console.'
+          console.log('Resposta full', scales)
+        }
+      } catch(err){
+        $('scalesList').textContent = 'Erro ao buscar escalas.'
+        showResponse(err)
+        console.error(err)
+      }
+    }
+
+    function renderScales(scales){
+      const container = $('scalesList')
+      container.innerHTML = ''
+      scales.forEach(s => {
+        const el = document.createElement('div')
+        el.className = 'scale-item'
+        el.innerHTML = `
+          <div class="scale-meta">
+            <div class="dot" style="background:${s.color || '#666'}">${s.name.split(' ').map(w=>w[0]).join('').slice(0,2)}</div>
+            <div>
+              <div style="font-weight:700">${s.name}</div>
+              <div class="muted">${s.description ? (s.description.slice(0,80)+(s.description.length > 80 ? '...' : '')) : ''}</div>
+            </div>
+          </div>
+          <div>
+            <button data-id="${s.id}">Abrir</button>
+          </div>
+        `
+        el.querySelector('button').addEventListener('click', ()=> loadScaleDetails(s.id))
+        container.appendChild(el)
+      })
+    }
+
+    async function loadScaleDetails(id){
+      $('scaleDetails').textContent = 'Carregando...'
+      $('questionsContainer').innerHTML = ''
+      try{
+        const data = await apiFetch(`/scales/${id}`)
+        if(data && data.id){
+          currentScale = data
+          renderScaleDetails(data)
+        } else {
+          $('scaleDetails').textContent = 'Resposta inesperada.'
+        }
+      } catch(err){
+        $('scaleDetails').textContent = 'Erro ao buscar detalhes.'
+        showResponse(err)
+        console.error(err)
+      }
+    }
+
+    function renderScaleDetails(scale){
+      $('scaleDetails').innerHTML = `
+        <div style="display:flex;gap:12px;align-items:center">
+          <div class="dot" style="background:${scale.color||'#666'}">${scale.name.split(' ').map(w=>w[0]).join('').slice(0,2)}</div>
+          <div>
+            <div style="font-weight:700">${scale.name}</div>
+            <div class="muted">${scale.description || ''}</div>
+          </div>
+        </div>
+      `
+
+      const qc = $('questionsContainer')
+      qc.innerHTML = ''
+      if(!scale.questions || !scale.questions.length){
+        qc.innerHTML = '<div class="muted">Essa escala não tem questões.</div>'
+        return
+      }
+
+      const questionsEl = document.createElement('div')
+      questionsEl.className = 'questions'
+
+      scale.questions.forEach(q => {
+        const qel = document.createElement('div')
+        qel.className = 'question'
+        qel.dataset.questionId = q.id
+        qel.innerHTML = `<div style="font-weight:700">${q.item_order}. ${q.content} <span class="muted">(${q.domain || 'Sem domínio'})</span></div>`
+
+        const itemsWrap = document.createElement('div')
+        itemsWrap.className = 'items'
+
+        q.itens.forEach(it => {
+          const itEl = document.createElement('div')
+          itEl.className = 'item'
+          itEl.dataset.itemId = it.id
+          itEl.dataset.questionId = q.id
+          itEl.dataset.score = it.score
+          itEl.textContent = `${it.item_order}. ${it.content} (pts: ${it.score})`
+          itEl.addEventListener('click', ()=> selectItem(itEl))
+          itemsWrap.appendChild(itEl)
+        })
+
+        qel.appendChild(itemsWrap)
+        questionsEl.appendChild(qel)
+      })
+
+      qc.appendChild(questionsEl)
+    }
+
+    function selectItem(itEl){
+      const qid = itEl.dataset.questionId
+      const siblings = document.querySelectorAll(`.item[data-question-id='${qid}']`)
+      siblings.forEach(s=>s.classList.remove('selected'))
+      itEl.classList.add('selected')
+    }
+
+    function buildPayload(){
+      if(!currentScale) throw 'Nenhuma escala carregada'
+      const title = currentScale.name + " - Avaliação"
+      const notes = ""
+      const client_fk = $('clientFk').value.trim() || null
+      const scale_fk = currentScale.id
+
+      const answers = []
+      document.querySelectorAll('.item.selected').forEach(sel => {
+        answers.push({ 
+          question_fk: parseInt(sel.dataset.questionId), 
+          item_fk: parseInt(sel.dataset.itemId) 
+        })
+      })
+
+      return { title, notes, client_fk, scale_fk, answers }
+    }
+
+    async function submitEvaluation(){
+      try{
+        const payload = buildPayload()
+        if(!payload.client_fk){
+          alert('ID do Cliente (UUID) é obrigatório.');
+          return;
+        }
+        showResponse({status:'Enviando', payload})
+        const res = await apiFetch('/evaluations', { method:'POST', body: JSON.stringify(payload) })
+        showResponse(res)
+        alert('Avaliação enviada com sucesso!')
+      } catch(err){
+        showResponse(err)
+        console.error('Erro na submissão:', err)
+        const errorMsg = err.body && typeof err.body === 'object' 
+          ? JSON.stringify(err.body) 
+          : (err.body || 'Erro desconhecido')
+        alert('Erro ao enviar: ' + errorMsg)
+      }
+    }
+
+    $('loadScalesBtn').addEventListener('click', loadScales)
+    $('submitBtn').addEventListener('click', submitEvaluation)
+    $('showPayloadBtn').addEventListener('click', ()=>{
+      try{ showResponse(buildPayload()) } catch(e){ showResponse({error:String(e)}) }
+    })
+
+    const params = new URLSearchParams(location.search)
+    if(params.get('base')) $('baseUrl').value = params.get('base')
+    if(params.get('token')) $('token').value = params.get('token')
+  </script>
+</body>
+</html>

@@ -1,7 +1,7 @@
 'use client';
 
 import { useState, useEffect } from 'react';
-import { RiUserLine, RiSearchLine, RiArrowLeftSLine, RiArrowRightSLine, RiInformationLine, RiErrorWarningLine } from 'react-icons/ri';
+import { RiUserLine, RiSearchLine, RiArrowLeftSLine, RiArrowRightSLine, RiInformationLine, RiErrorWarningLine, RiGenderlessLine } from 'react-icons/ri';
 import { useAuthStore } from '@/lib/stores/store';
 import { clientService } from '@/lib/api/clients';
 import { ClientRelation, PaginationMeta } from '@/types/client';
@@ -18,6 +18,8 @@ export default function UserList() {
   const [error, setError] = useState<string | null>(null);
   const [page, setPage] = useState(1);
   const [imageErrors, setImageErrors] = useState<Record<string, boolean>>({});
+  const [searchTerm, setSearchTerm] = useState('');
+  const [genderFilter, setGenderFilter] = useState('');
 
   const baseUrl = process.env.NEXT_PUBLIC_API_URL || 'https://acompanhar-production.up.railway.app';
 
@@ -27,7 +29,7 @@ export default function UserList() {
     setLoading(true);
     setError(null);
     try {
-      const response = await clientService.getClients(user.role, p, 9);
+      const response = await clientService.getClients(user.role, p, 9, searchTerm, genderFilter);
       setRelations(response.data);
       setMeta(response.meta);
     } catch (err: any) {
@@ -42,8 +44,12 @@ export default function UserList() {
   };
 
   useEffect(() => {
-    fetchClients(page);
-  }, [page, user?.role]);
+    const timer = setTimeout(() => {
+      fetchClients(page);
+    }, 300);
+
+    return () => clearTimeout(timer);
+  }, [page, user?.role, searchTerm, genderFilter]);
 
   const handleImageError = (id: string) => {
     setImageErrors(prev => ({ ...prev, [id]: true }));
@@ -91,13 +97,56 @@ export default function UserList() {
           <p className="text-white/50 text-sm">Visualize e gerencie o progresso dos pacientes sob seu cuidado.</p>
         </div>
 
-        <div className="relative group">
-          <RiSearchLine className="absolute left-4 top-1/2 -translate-y-1/2 text-white/30 group-focus-within:text-primary transition-colors" />
-          <input 
-            type="text" 
-            placeholder="Buscar por nome ou código..." 
-            className="w-full md:w-72 bg-white/5 border border-white/10 rounded-2xl py-3.5 pl-12 pr-4 text-white placeholder:text-white/20 focus:outline-none focus:ring-2 focus:ring-primary/50 focus:border-primary/50 transition-all text-sm"
-          />
+        <div className="space-y-4">
+          <div className="relative group">
+            <RiSearchLine className="absolute left-4 top-1/2 -translate-y-1/2 text-white/30 group-focus-within:text-primary transition-colors" />
+            <input 
+              type="text" 
+              placeholder="Buscar por nome ou identificador..." 
+              value={searchTerm}
+              onChange={(e) => {
+                setSearchTerm(e.target.value);
+                setPage(1);
+              }}
+              className="w-full md:w-72 bg-white/5 border border-white/10 rounded-2xl py-3.5 pl-12 pr-4 text-white placeholder:text-white/20 focus:outline-none focus:ring-2 focus:ring-primary/50 focus:border-primary/50 transition-all text-sm shadow-inner"
+            />
+          </div>
+
+          <div className="flex items-center gap-2 overflow-x-auto pb-2 no-scrollbar">
+            <button
+              onClick={() => { setGenderFilter(''); setPage(1); }}
+              className={cn(
+                "px-4 py-2 rounded-xl text-[10px] font-black uppercase tracking-widest transition-all border shrink-0",
+                genderFilter === '' 
+                  ? "bg-primary text-secondary-dark border-primary shadow-lg shadow-primary/10" 
+                  : "bg-white/5 text-white/40 border-white/5 hover:bg-white/10"
+              )}
+            >
+              Todos
+            </button>
+            <button
+              onClick={() => { setGenderFilter('male'); setPage(1); }}
+              className={cn(
+                "px-4 py-2 rounded-xl text-[10px] font-black uppercase tracking-widest transition-all border shrink-0",
+                genderFilter === 'male' 
+                  ? "bg-blue-500 text-white border-blue-500 shadow-lg shadow-blue-500/10" 
+                  : "bg-white/5 text-white/40 border-white/5 hover:bg-white/10"
+              )}
+            >
+              Masculino
+            </button>
+            <button
+              onClick={() => { setGenderFilter('female'); setPage(1); }}
+              className={cn(
+                "px-4 py-2 rounded-xl text-[10px] font-black uppercase tracking-widest transition-all border shrink-0",
+                genderFilter === 'female' 
+                  ? "bg-pink-500 text-white border-pink-500 shadow-lg shadow-pink-500/10" 
+                  : "bg-white/5 text-white/40 border-white/5 hover:bg-white/10"
+              )}
+            >
+              Feminino
+            </button>
+          </div>
         </div>
       </div>
 
@@ -126,7 +175,7 @@ export default function UserList() {
               const client = relation.clients;
               return (
                 <Link 
-                  href={`/patients/${client.id}`}
+                  href={`/patients/${client.id}?rel=${relation.id}`}
                   key={relation.id} 
                   className="bg-tertiary border border-white/5 p-6 rounded-[2.5rem] hover:border-primary/30 hover:bg-primary/5 transition-all group cursor-pointer relative overflow-hidden block"
                 >
