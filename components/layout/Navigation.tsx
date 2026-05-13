@@ -1,6 +1,6 @@
 'use client';
 
-import { RiGroupLine, RiUserSettingsLine, RiLightbulbFlashLine, RiLogoutBoxLine } from 'react-icons/ri';
+import { RiGroupLine, RiUserSettingsLine, RiLightbulbFlashLine, RiLogoutBoxLine, RiUserStarLine } from 'react-icons/ri';
 import { useRouter } from 'next/navigation';
 import { cn } from '@/lib/utils';
 import Image from 'next/image';
@@ -9,7 +9,7 @@ import { UserRole } from '@/types/auth';
 
 import { IconType } from 'react-icons';
 
-export type TabType = 'users' | 'profile' | 'suggestions';
+export type TabType = 'users' | 'profile' | 'suggestions' | 'professionals';
 
 interface NavigationProps {
   activeTab: TabType;
@@ -24,6 +24,7 @@ export interface NavItem {
 
 export const ROLE_MENUS: Record<string, NavItem[]> = {
   admin: [
+    { id: 'professionals', label: 'Equipe', icon: RiUserStarLine },
     { id: 'profile', label: 'Perfil', icon: RiUserSettingsLine },
     { id: 'suggestions', label: 'FAQ', icon: RiLightbulbFlashLine },
   ],

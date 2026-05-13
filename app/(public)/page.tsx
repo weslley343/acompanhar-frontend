@@ -2,11 +2,12 @@
 
 import { useState, SyntheticEvent } from 'react';
 import Image from 'next/image';
+import Link from 'next/link';
 import { useRouter } from 'next/navigation';
 import { authApi } from '@/lib/api/auth';
 import { useAuthStore } from '@/lib/stores/store';
 import { UserRole } from '@/types/auth';
-import { RiUserStarLine, RiHeartLine, RiArrowLeftLine } from 'react-icons/ri';
+import { RiUserStarLine, RiHeartLine, RiArrowLeftLine, RiMagicLine } from 'react-icons/ri';
 
 export default function Home() {
   const { setAuth } = useAuthStore();
@@ -144,9 +145,22 @@ export default function Home() {
           </div>
         )}
 
-        <p className="text-center text-xs text-white/20 font-medium">
-          Acesso restrito a profissionais e responsáveis autorizados.
-        </p>
+        <div className="flex flex-col gap-4">
+          <p className="text-center text-xs text-white/20 font-medium">
+            Acesso restrito a profissionais e responsáveis autorizados.
+          </p>
+          <div className="h-px bg-white/5 w-full" />
+          <Link 
+            href="/generate-demo"
+            className="flex items-center justify-center gap-2 py-4 bg-tertiary border border-white/5 text-white/60 hover:text-primary hover:border-primary/20 rounded-2xl text-xs font-bold uppercase tracking-widest transition-all group"
+          >
+            <RiMagicLine size={16} className="group-hover:rotate-12 transition-transform" />
+            Experimentar Demo
+          </Link>
+          <p className="text-center text-[10px] text-white/20 font-bold uppercase tracking-widest mt-2">
+            É responsável? <Link href="/register" className="text-primary/60 hover:text-primary transition-colors">Crie sua conta aqui</Link>
+          </p>
+        </div>
       </div>
     </main>
   );

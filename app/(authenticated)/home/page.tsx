@@ -7,7 +7,8 @@ import UserList from '@/components/home/UserList';
 import ProfileEdit from '@/components/home/ProfileEdit';
 import Suggestions from '@/components/home/Suggestions';
 import FAB from '@/components/ui/FAB';
-import { RiAddLine, RiLink } from 'react-icons/ri';
+import { RiAddLine, RiLink, RiUserStarLine } from 'react-icons/ri';
+import ProfessionalList from '@/components/admin/ProfessionalList';
 
 export default function HomePage() {
   const { user } = useAuthStore();
@@ -43,6 +44,8 @@ export default function HomePage() {
         return <ProfileEdit />;
       case 'suggestions':
         return <Suggestions />;
+      case 'professionals':
+        return <ProfessionalList />;
       default:
         return null;
     }
