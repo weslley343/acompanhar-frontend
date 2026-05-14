@@ -6,7 +6,7 @@ export const demoApi = {
     const { data } = await api.post<DemoResponse>('/generate-demo', {
       professionalName,
       responsibleName,
-    });
+    }, { timeout: 60000 });
     return data;
   },
 };
