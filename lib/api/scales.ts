@@ -10,5 +10,10 @@ export const scaleService = {
   async getScaleById(id: number | string): Promise<Scale> {
     const response = await api.get<Scale>(`/scales/${id}`);
     return response.data;
+  },
+
+  async getQuestionById(id: number | string): Promise<any> {
+    const response = await api.get<any>(`/questions/${id}`);
+    return response.data;
   }
 };

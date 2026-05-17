@@ -197,6 +197,7 @@ function PatientDetailContent() {
                     src={getImageUrl(patient.image_url) || ''}
                     alt={patient.full_name}
                     fill
+                    sizes="(max-width: 768px) 128px, 160px"
                     className="object-cover"
                   />
                 ) : (
@@ -429,6 +430,7 @@ function PatientDetailContent() {
                           src={getImageUrl(prof.image_url) || ''}
                           alt={prof.full_name}
                           fill
+                          sizes="64px"
                           className="object-cover"
                         />
                       ) : (
@@ -483,6 +485,7 @@ function PatientDetailContent() {
                           src={getImageUrl(resp.image_url) || ''}
                           alt={resp.full_name}
                           fill
+                          sizes="64px"
                           className="object-cover"
                         />
                       ) : (

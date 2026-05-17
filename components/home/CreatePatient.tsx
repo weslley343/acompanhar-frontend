@@ -203,6 +203,7 @@ export default function CreatePatient() {
                             src={displayUrl} 
                             alt="Avatar" 
                             fill 
+                            sizes="80px"
                             className="object-cover"
                           />
                           {isSelected && (

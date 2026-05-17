@@ -125,6 +125,7 @@ export default function ScaleSelection() {
                         src={getImageUrl(scale.image_url) || ''} 
                         alt={scale.name}
                         fill
+                        sizes="64px"
                         className="object-cover"
                       />
                     ) : (

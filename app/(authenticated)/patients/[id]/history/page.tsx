@@ -12,7 +12,8 @@ import {
   RiCalendarLine,
   RiUser3Line,
   RiDeleteBinLine,
-  RiErrorWarningLine
+  RiErrorWarningLine,
+  RiRocketLine
 } from 'react-icons/ri';
 import { evaluationService } from '@/lib/api/evaluations';
 import { clientService } from '@/lib/api/clients';
@@ -300,7 +301,16 @@ export default function PatientHistory() {
                   </div>
                   
                   <div className="flex items-center gap-2">
-                    <RiArrowRightSLine className="text-white/10 group-hover:text-primary group-hover:translate-x-1 transition-all shrink-0" size={24} />
+                    <button
+                      onClick={(e) => {
+                        e.stopPropagation();
+                        router.push(`/studio/analysis/${ev.id}?clientId=${ev.client_fk}&scaleId=${ev.scale_fk}`);
+                      }}
+                      className="p-3 bg-white/5 hover:bg-primary/10 hover:text-primary rounded-2xl transition-all active:scale-95 z-20"
+                      title="Abrir no Studio"
+                    >
+                      <RiRocketLine size={20} />
+                    </button>
                     
                     {(user?.role === 'admin' || user?.id === ev.professional_fk) && (
                       <button
@@ -310,10 +320,13 @@ export default function PatientHistory() {
                           setIsDeleteModalOpen(true);
                         }}
                         className="p-3 bg-white/5 hover:bg-red-500/10 hover:text-red-500 rounded-2xl transition-all active:scale-95 z-20"
+                        title="Excluir Avaliação"
                       >
                         <RiDeleteBinLine size={20} />
                       </button>
                     )}
+
+                    <RiArrowRightSLine className="text-white/10 group-hover:text-primary group-hover:translate-x-1 transition-all shrink-0 ml-1" size={24} />
                   </div>
                 </div>
               ))

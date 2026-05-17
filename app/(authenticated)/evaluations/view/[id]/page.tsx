@@ -20,6 +20,7 @@ import {
 import { evaluationService } from '@/lib/api/evaluations';
 import { EvaluationResponse } from '@/types/evaluation';
 import { cn } from '@/lib/utils';
+import { useAuthStore } from '@/lib/stores/store';
 
 export default function EvaluationView() {
   const { id } = useParams();
@@ -176,7 +177,9 @@ export default function EvaluationView() {
         {/* Studio CTA Section */}
         <section className="animate-fade-in-up delay-100">
           <button
-            onClick={() => router.push('/studio')}
+            onClick={() => {
+              router.push(`/studio/analysis/${evaluation.id}?clientId=${evaluation.client_fk}&scaleId=${evaluation.scale_fk}`);
+            }}
             className="w-full p-8 bg-gradient-to-br from-primary/10 via-primary/5 to-transparent border border-primary/20 rounded-[2.5rem] flex flex-col md:flex-row items-center gap-6 group hover:border-primary/40 transition-all hover:shadow-[0_20px_40px_-15px_rgba(var(--primary-rgb),0.1)] active:scale-[0.98]"
           >
             <div className="w-20 h-20 bg-primary/20 rounded-3xl flex items-center justify-center text-primary group-hover:scale-110 group-hover:rotate-12 transition-all">
