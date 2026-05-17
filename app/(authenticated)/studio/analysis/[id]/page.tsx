@@ -697,12 +697,19 @@ function StudioAnalysisContent() {
                 <div key={idx}
                   onClick={() => toggleExpandQuestion(rec.questionid)}
                   className="group bg-tertiary border border-white/5 hover:border-primary/20 rounded-[2rem] p-6 transition-all duration-300 flex flex-col relative overflow-hidden cursor-pointer active:scale-[0.99] select-none hover:shadow-lg hover:shadow-primary/5"
+                  style={{ borderLeftColor: rec.color || '#3b82f6' }}
                 >
-                  <div className="absolute top-0 left-0 w-1.5 h-full bg-primary/20 group-hover:bg-primary transition-colors" />
+                  <div 
+                    className="absolute top-0 left-0 w-1.5 h-full opacity-40 group-hover:opacity-100 transition-opacity" 
+                    style={{ backgroundColor: rec.color || '#3b82f6' }}
+                  />
 
                   {/* Main Row */}
                   <div className="flex items-center gap-6">
-                    <div className="w-14 h-14 rounded-2xl bg-secondary flex items-center justify-center text-primary shrink-0 transition-transform duration-300 group-hover:scale-105">
+                    <div 
+                      className="w-14 h-14 rounded-2xl bg-secondary flex items-center justify-center shrink-0 transition-transform duration-300 group-hover:scale-105"
+                      style={{ color: rec.color || 'var(--primary)' }}
+                    >
                       <span className="text-xl font-black">#{idx + 1}</span>
                     </div>
 
@@ -717,10 +724,13 @@ function StudioAnalysisContent() {
 
                     <div className="flex items-center shrink-0">
                       {/* Expand Arrow Indicator */}
-                      <div className={cn(
-                        "w-8 h-8 rounded-xl bg-white/5 border border-white/5 flex items-center justify-center text-white/40 transition-all duration-300 group-hover:text-white group-hover:bg-white/10",
-                        expandedQuestions[rec.questionid] && "rotate-90 bg-primary/10 text-primary border-primary/20"
-                      )}>
+                      <div 
+                        className={cn(
+                          "w-8 h-8 rounded-xl bg-white/5 border border-white/5 flex items-center justify-center text-white/40 transition-all duration-300 group-hover:text-white group-hover:bg-white/10",
+                          expandedQuestions[rec.questionid] && "rotate-90 border-primary/20"
+                        )}
+                        style={expandedQuestions[rec.questionid] ? { color: rec.color || 'var(--primary)', backgroundColor: `${rec.color || '#3b82f6'}15`, borderColor: `${rec.color || '#3b82f6'}30` } : {}}
+                      >
                         <RiArrowRightSLine size={20} />
                       </div>
                     </div>
