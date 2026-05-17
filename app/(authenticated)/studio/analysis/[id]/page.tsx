@@ -396,9 +396,15 @@ function StudioAnalysisContent() {
   };
 
   return (
-    <div className="min-h-screen bg-secondary text-white flex flex-col pb-12">
+    <div 
+      className="min-h-screen text-white flex flex-col pb-12"
+      style={{ background: 'radial-gradient(circle at 100% 0%, rgba(20, 110, 112, 0.25), transparent 50%), radial-gradient(circle at 0% 100%, rgba(14, 57, 58, 0.5), transparent 50%), #0e393a' }}
+    >
       {/* Header */}
-      <header className="h-20 flex items-center px-6 border-b border-white/5 bg-secondary/80 backdrop-blur-xl sticky top-0 z-50">
+      <header 
+        className="h-20 flex items-center px-6 border-b border-white/5 backdrop-blur-xl sticky top-0 z-50"
+        style={{ backgroundColor: 'rgba(14, 57, 58, 0.8)' }}
+      >
         <div className="max-w-4xl w-full mx-auto flex items-center gap-4">
           <button
             onClick={() => router.back()}
@@ -411,7 +417,7 @@ function StudioAnalysisContent() {
               <RiRocketLine size={24} />
             </div>
             <div>
-              <h1 className="text-xl font-black tracking-tighter uppercase leading-none">Studio Analysis</h1>
+              <h1 className="text-xl font-black tracking-tighter uppercase leading-none">Studio</h1>
               <p className="text-[10px] font-bold text-white/40 uppercase tracking-widest mt-1">Motor de Busca</p>
             </div>
           </div>
@@ -834,7 +840,10 @@ function StudioAnalysisContent() {
 export default function StudioAnalysis() {
   return (
     <Suspense fallback={
-      <div className="min-h-screen bg-secondary flex flex-col items-center justify-center">
+      <div 
+        className="min-h-screen flex flex-col items-center justify-center"
+        style={{ backgroundColor: '#0e393a' }}
+      >
         <RiLoader4Line className="text-primary animate-spin" size={40} />
       </div>
     }>
