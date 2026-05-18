@@ -27,7 +27,7 @@ export default function Home() {
       if (!activeTab) return;
       // Login com base no papel selecionado
       const authData = await authApi.login({ email, password }, activeTab);
-      
+
       if (!authData || !authData.token) {
         throw new Error('Resposta de login inválida do servidor.');
       }
@@ -54,10 +54,10 @@ export default function Home() {
         {/* Logo Section */}
         <div className="flex flex-col items-center gap-4">
           <div className="relative w-20 h-20 mb-2">
-            <Image 
-              src="/logo/logo.png" 
-              alt="Logo" 
-              fill 
+            <Image
+              src="/logo/logo.png"
+              alt="Logo"
+              fill
               className="object-contain"
               priority
             />
@@ -90,14 +90,14 @@ export default function Home() {
                 <div className="w-12 h-12 rounded-2xl bg-white/5 flex items-center justify-center text-white/40 group-hover:bg-secondary group-hover:text-primary transition-all">
                   <RiHeartLine size={24} />
                 </div>
-                <span className="text-sm font-bold text-white group-hover:text-secondary">Responsável</span>
+                <span className="text-sm font-bold text-white group-hover:text-secondary">Pai ou Responsável</span>
               </button>
             </div>
           </div>
         ) : (
           <div className="flex flex-col gap-6 animate-fade-in-up">
             <div className="flex items-center justify-between">
-              <button 
+              <button
                 onClick={() => setActiveTab(null)}
                 className="text-white/20 hover:text-white flex items-center gap-2 text-xs font-bold uppercase tracking-widest transition-all"
               >
@@ -150,7 +150,7 @@ export default function Home() {
             Acesso restrito a profissionais e responsáveis autorizados.
           </p>
           <div className="h-px bg-white/5 w-full" />
-          <Link 
+          <Link
             href="/generate-demo"
             className="flex items-center justify-center gap-2 py-4 bg-tertiary border border-white/5 text-white/60 hover:text-primary hover:border-primary/20 rounded-2xl text-xs font-bold uppercase tracking-widest transition-all group"
           >
