@@ -12,6 +12,7 @@ interface FABProps {
   className?: string;
   variant?: 'primary' | 'secondary';
   showLabel?: boolean;
+  labelSide?: 'left' | 'right';
 }
 
 export default function FAB({ 
@@ -21,7 +22,8 @@ export default function FAB({
   label, 
   className,
   variant = 'primary',
-  showLabel = false
+  showLabel = false,
+  labelSide = 'left',
 }: FABProps) {
   const baseClassName = cn(
     "flex items-center justify-center transition-all active:scale-95 group relative z-40",
@@ -34,8 +36,14 @@ export default function FAB({
 
   const labelContent = label && (
     <span className={cn(
-      "absolute right-full mr-4 px-3 py-1.5 bg-secondary/90 backdrop-blur-md border border-white/10 text-white text-xs font-bold rounded-xl whitespace-nowrap transition-all duration-300 pointer-events-none",
-      showLabel ? "opacity-100 translate-x-0" : "opacity-0 translate-x-4 group-hover:opacity-100 group-hover:translate-x-0"
+      "absolute px-3 py-1.5 bg-secondary/90 backdrop-blur-md border border-white/10 text-white text-xs font-bold rounded-xl whitespace-nowrap transition-all duration-300 pointer-events-none",
+      labelSide === 'left'
+        ? "right-full mr-4"
+        : "left-full ml-4",
+      showLabel ? "opacity-100 translate-x-0" : cn(
+        "opacity-0 group-hover:opacity-100",
+        labelSide === 'left' ? "translate-x-4 group-hover:translate-x-0" : "-translate-x-4 group-hover:translate-x-0"
+      )
     )}>
       {label}
     </span>

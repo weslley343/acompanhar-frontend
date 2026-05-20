@@ -93,8 +93,14 @@ export default function UserList() {
     <div className="w-full max-w-4xl mx-auto space-y-8 animate-fade-in-up pb-12">
       <div className="flex flex-col md:flex-row md:items-center justify-between gap-6">
         <div>
-          <h2 className="text-3xl font-bold text-white tracking-tight">Pacientes</h2>
-          <p className="text-white/50 text-sm">Visualize e gerencie o progresso dos pacientes sob seu cuidado.</p>
+          <h2 className="text-3xl font-bold text-white tracking-tight">
+            {user?.role === 'responsible' ? 'Vínculos' : 'Pacientes'}
+          </h2>
+          <p className="text-white/50 text-sm">
+            {user?.role === 'responsible'
+              ? 'Visualize o progresso dos seus vinculados.'
+              : 'Visualize e gerencie o progresso dos pacientes sob seu cuidado.'}
+          </p>
         </div>
 
         <div className="space-y-4">

@@ -32,6 +32,12 @@ export interface CreateProfessionalPayload {
   description?: string;
 }
 
+export interface DashboardData {
+  total_scales: number;
+  total_evaluations: number;
+  total_linked_clients: number;
+}
+
 export const professionalApi = {
   list: async (params: { page?: number; limit?: number; name?: string; identifier?: string; specialty?: string } = {}) => {
     const { data } = await api.get<ProfessionalListResponse>('/professionals', { params });
@@ -45,5 +51,10 @@ export const professionalApi = {
 
   delete: async (id: string) => {
     await api.delete(`/professionals/${id}`);
+  },
+
+  getDashboard: async (): Promise<DashboardData> => {
+    const { data } = await api.get<DashboardData>('/professionals/dashboard');
+    return data;
   },
 };
