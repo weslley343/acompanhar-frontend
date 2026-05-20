@@ -196,10 +196,8 @@ export default function UserList() {
                     </div>
                     <div className="flex-1 min-w-0">
                       <h3 className="text-white font-bold truncate group-hover:text-primary transition-colors">{client.full_name}</h3>
-                      <div className="flex items-center gap-2">
-                        <span className="text-[10px] text-white/30 uppercase tracking-widest font-black">{client.code || 'S/ CODE'}</span>
-                        <span className="w-1 h-1 rounded-full bg-white/10" />
-                        <span className="text-[10px] text-white/30 uppercase tracking-widest font-black">{client.identifier || 'S/ USER'}</span>
+                      <div className="flex flex-col mt-0.5">
+                        <span className="text-[10px] text-card-identifier uppercase tracking-widest font-black truncate">{client.identifier || 'S/ USER'}</span>
                       </div>
                     </div>
                   </div>

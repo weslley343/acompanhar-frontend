@@ -5,7 +5,7 @@ import { useRouter } from 'next/navigation';
 import { cn } from '@/lib/utils';
 import Image from 'next/image';
 import { useAuthStore } from '@/lib/stores/store';
-import { UserRole } from '@/types/auth';
+import ThemeToggle from '@/components/ui/ThemeToggle';
 
 import { IconType } from 'react-icons';
 
@@ -56,7 +56,7 @@ export default function Navigation({ activeTab, onTabChange }: NavigationProps) 
       <nav className="hidden md:flex fixed top-0 left-0 right-0 h-20 bg-secondary/80 backdrop-blur-xl border-b border-white/5 z-50 items-center justify-center px-6">
         <div className="max-w-4xl w-full flex items-center justify-between">
           <div className="flex items-center gap-3">
-            <Image src="/logo/logo.png" alt="Acompanha Logo" width={40} height={40} className="rounded-lg" />
+            <Image src="/logo/logo.png" alt="Acompanha Logo" width={40} height={40} className="rounded-lg" style={{ height: 'auto' }} />
           </div>
 
           <div className="flex items-center gap-2 bg-white/5 p-1.5 rounded-2xl border border-white/5">
@@ -78,6 +78,7 @@ export default function Navigation({ activeTab, onTabChange }: NavigationProps) 
           </div>
 
           <div className="flex items-center gap-4">
+            <ThemeToggle />
             <button
               onClick={() => {
                 logout();
@@ -91,6 +92,11 @@ export default function Navigation({ activeTab, onTabChange }: NavigationProps) 
           </div>
         </div>
       </nav>
+
+      {/* Mobile Top Floating Theme Toggle */}
+      <div className="md:hidden fixed top-6 right-6 z-50">
+        <ThemeToggle />
+      </div>
 
       {/* Mobile Bottom Tab Bar */}
       <nav className="md:hidden fixed bottom-6 left-6 right-6 h-20 bg-tertiary/90 backdrop-blur-2xl border border-white/10 rounded-[2.5rem] z-50 flex items-center justify-around px-4 shadow-2xl shadow-black/50 overflow-hidden">

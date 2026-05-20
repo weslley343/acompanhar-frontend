@@ -107,6 +107,8 @@ function StudioAnalysisContent() {
   const wsRef = useRef<WebSocket | null>(null);
   const logEndRef = useRef<HTMLDivElement>(null);
 
+
+
   useEffect(() => {
     if (logEndRef.current) {
       logEndRef.current.scrollIntoView({ behavior: 'smooth' });
@@ -397,13 +399,11 @@ function StudioAnalysisContent() {
 
   return (
     <div 
-      className="min-h-screen text-white flex flex-col pb-12"
-      style={{ background: 'radial-gradient(circle at 100% 0%, rgba(20, 110, 112, 0.25), transparent 50%), radial-gradient(circle at 0% 100%, rgba(14, 57, 58, 0.5), transparent 50%), #0e393a' }}
+      className="min-h-screen text-white flex flex-col pb-12 studio-page-bg"
     >
       {/* Header */}
       <header 
-        className="h-20 flex items-center px-6 border-b border-white/5 backdrop-blur-xl sticky top-0 z-50"
-        style={{ backgroundColor: 'rgba(14, 57, 58, 0.8)' }}
+        className="h-20 flex items-center px-6 border-b border-white/5 sticky top-0 z-50 studio-header-bg"
       >
         <div className="max-w-4xl w-full mx-auto flex items-center gap-4">
           <button
@@ -418,7 +418,7 @@ function StudioAnalysisContent() {
             </div>
             <div>
               <h1 className="text-xl font-black tracking-tighter uppercase leading-none">Studio</h1>
-              <p className="text-[10px] font-bold text-white/40 uppercase tracking-widest mt-1">Motor de Busca</p>
+              <p className="text-[10px] font-bold text-card-code uppercase tracking-widest mt-1">Motor de Busca</p>
             </div>
           </div>
         </div>
@@ -497,7 +497,7 @@ function StudioAnalysisContent() {
               <div className="space-y-1">
                 <p className="text-[10px] font-black text-primary uppercase tracking-[0.2em]">Rastreabilidade Clínica</p>
                 <h3 className="text-xl font-black uppercase tracking-tighter">Histórico de Diagnóstico RecSys</h3>
-                <p className="text-xs text-white/40">Detalhamento técnico da busca de similaridade e cálculos de intensidade efetuados</p>
+                <p className="text-xs text-card-code">Detalhamento técnico da busca de similaridade e cálculos de intensidade efetuados</p>
               </div>
               <div className="flex items-center gap-2 px-3 py-1.5 bg-primary/10 border border-primary/20 rounded-full">
                 <span className="w-1.5 h-1.5 bg-primary rounded-full animate-ping" />
@@ -591,7 +591,7 @@ function StudioAnalysisContent() {
               {/* Similarity Slider */}
               <div className="space-y-4 bg-white/5 border border-white/5 p-6 rounded-[2rem] hover:border-primary/10 transition-all">
                 <div className="flex justify-between items-center">
-                  <label className="text-[10px] font-black text-white/40 uppercase tracking-widest">Similaridade</label>
+                  <label className="text-[10px] font-black text-card-identifier uppercase tracking-widest">Similaridade</label>
                   <span className="text-xs font-black text-primary bg-primary/10 px-3 py-1 rounded-xl">
                     {params.ntop_similarity} {params.ntop_similarity === 1 ? 'Paciente' : 'Pacientes'}
                   </span>
@@ -609,7 +609,7 @@ function StudioAnalysisContent() {
                     }}
                     className="w-full accent-primary h-1.5 bg-white/10 rounded-lg appearance-none cursor-pointer focus:outline-none"
                   />
-                  <div className="flex justify-between text-[9px] text-white/20 font-black mt-2 px-1">
+                  <div className="flex justify-between text-[9px] text-card-code font-black mt-2 px-1">
                     <span>3 Pacientes</span>
                     <span>5 Pacientes</span>
                     <span>10 Pacientes</span>
@@ -620,7 +620,7 @@ function StudioAnalysisContent() {
               {/* Recommendations Slider */}
               <div className="space-y-4 bg-white/5 border border-white/5 p-6 rounded-[2rem] hover:border-primary/10 transition-all">
                 <div className="flex justify-between items-center">
-                  <label className="text-[10px] font-black text-white/40 uppercase tracking-widest">Recomendações</label>
+                  <label className="text-[10px] font-black text-card-identifier uppercase tracking-widest">Recomendações</label>
                   <span className="text-xs font-black text-primary bg-primary/10 px-3 py-1 rounded-xl">
                     {params.ntop_recommendations} {params.ntop_recommendations === 1 ? 'Item' : 'Itens'}
                   </span>
@@ -638,7 +638,7 @@ function StudioAnalysisContent() {
                     }}
                     className="w-full accent-primary h-1.5 bg-white/10 rounded-lg appearance-none cursor-pointer focus:outline-none"
                   />
-                  <div className="flex justify-between text-[9px] text-white/20 font-black mt-2 px-1">
+                  <div className="flex justify-between text-[9px] text-card-code font-black mt-2 px-1">
                     <span>3 Itens</span>
                     <span>5 Itens</span>
                     <span>10 Itens</span>
@@ -649,7 +649,7 @@ function StudioAnalysisContent() {
               {/* Time Window Slider */}
               <div className="space-y-4 bg-white/5 border border-white/5 p-6 rounded-[2rem] hover:border-primary/10 transition-all">
                 <div className="flex justify-between items-center">
-                  <label className="text-[10px] font-black text-white/40 uppercase tracking-widest">Janela Temporal</label>
+                  <label className="text-[10px] font-black text-card-identifier uppercase tracking-widest">Janela Temporal</label>
                   <span className="text-xs font-black text-primary bg-primary/10 px-3 py-1 rounded-xl">
                     {params.days_window} {params.days_window === 1 ? 'Dia' : 'Dias'}
                   </span>
@@ -667,7 +667,7 @@ function StudioAnalysisContent() {
                     }}
                     className="w-full accent-primary h-1.5 bg-white/10 rounded-lg appearance-none cursor-pointer focus:outline-none"
                   />
-                  <div className="flex justify-between text-[9px] text-white/20 font-black mt-2 px-1">
+                  <div className="flex justify-between text-[9px] text-card-code font-black mt-2 px-1">
                     <span>7 Dias</span>
                     <span>30 Dias</span>
                     <span>60 Dias</span>
@@ -693,95 +693,110 @@ function StudioAnalysisContent() {
                 <RiBrainLine size={24} />
                 <h3 className="text-lg font-black uppercase tracking-tighter">Sugestões de Foco Clínico</h3>
               </div>
-              <span className="px-3 py-1 bg-white/5 text-white/40 text-[10px] font-black rounded-full uppercase tracking-widest border border-white/5">
+              <span className="px-3 py-1 bg-white/5 text-card-identifier text-[10px] font-black rounded-full uppercase tracking-widest border border-white/5">
                 Top {state.recommendations.length} Prioridades
               </span>
             </div>
 
             <div className="grid grid-cols-1 gap-4">
-              {state.recommendations.map((rec, idx) => (
-                <div key={idx}
-                  onClick={() => toggleExpandQuestion(rec.questionid)}
-                  className="group bg-tertiary border border-white/5 hover:border-primary/20 rounded-[2rem] p-6 transition-all duration-300 flex flex-col relative overflow-hidden cursor-pointer active:scale-[0.99] select-none hover:shadow-lg hover:shadow-primary/5"
-                  style={{ borderLeftColor: rec.color || '#3b82f6' }}
-                >
-                  <div 
-                    className="absolute top-0 left-0 w-1.5 h-full opacity-40 group-hover:opacity-100 transition-opacity" 
-                    style={{ backgroundColor: rec.color || '#3b82f6' }}
-                  />
-
-                  {/* Main Row */}
-                  <div className="flex items-center gap-6">
+              {state.recommendations.map((rec, idx) => {
+                const cardColor = rec.color || '#3b82f6';
+                return (
+                  <div key={idx}
+                    onClick={() => toggleExpandQuestion(rec.questionid)}
+                    className="group bg-tertiary border border-white/5 hover:border-primary/20 rounded-[2rem] p-6 transition-all duration-300 flex flex-col relative overflow-hidden cursor-pointer active:scale-[0.99] select-none hover:shadow-lg hover:shadow-primary/5"
+                    style={{ borderLeftColor: cardColor }}
+                  >
                     <div 
-                      className="w-14 h-14 rounded-2xl bg-secondary flex items-center justify-center shrink-0 transition-transform duration-300 group-hover:scale-105"
-                      style={{ color: rec.color || 'var(--primary)' }}
-                    >
-                      <span className="text-xl font-black">#{idx + 1}</span>
-                    </div>
+                      className="absolute top-0 left-0 w-1.5 h-full opacity-40 group-hover:opacity-100 transition-opacity" 
+                      style={{ backgroundColor: cardColor }}
+                    />
 
-                    <div className="flex-1 min-w-0">
-                      <p className="text-[10px] font-black text-white/20 uppercase tracking-widest mb-1">
-                        {rec.domain ? `${rec.domain} • ` : ''}Questão ID: {rec.questionid}
-                      </p>
-                      <h4 className="text-base font-bold text-white group-hover:text-primary transition-colors leading-tight">
-                        {rec.content || `Questão #${rec.questionid}`}
-                      </h4>
-                    </div>
-
-                    <div className="flex items-center shrink-0">
-                      {/* Expand Arrow Indicator */}
+                    {/* Main Row */}
+                    <div className="flex items-center gap-6">
+                      {/* Ranking badge/item with universal border stroke and dark text outline */}
                       <div 
-                        className={cn(
-                          "w-8 h-8 rounded-xl bg-white/5 border border-white/5 flex items-center justify-center text-white/40 transition-all duration-300 group-hover:text-white group-hover:bg-white/10",
-                          expandedQuestions[rec.questionid] && "rotate-90 border-primary/20"
-                        )}
-                        style={expandedQuestions[rec.questionid] ? { color: rec.color || 'var(--primary)', backgroundColor: `${rec.color || '#3b82f6'}15`, borderColor: `${rec.color || '#3b82f6'}30` } : {}}
+                        className="w-14 h-14 rounded-2xl bg-secondary flex items-center justify-center shrink-0 transition-transform duration-300 group-hover:scale-105 border border-slate-200 dark:border-white/10"
+                        style={{ color: cardColor }}
                       >
-                        <RiArrowRightSLine size={20} />
+                        <span 
+                          className="text-xl font-black"
+                          style={{
+                            WebkitTextStroke: '1px #475569'
+                          }}
+                        >
+                          #{idx + 1}
+                        </span>
+                      </div>
+
+                      <div className="flex-1 min-w-0">
+                        <p className="text-[10px] font-black text-card-code uppercase tracking-widest mb-1">
+                          {rec.domain ? `${rec.domain} • ` : ''}Questão ID: {rec.questionid}
+                        </p>
+                        <h4 className="text-base font-bold text-white group-hover:text-primary transition-colors leading-tight">
+                          {rec.content || `Questão #${rec.questionid}`}
+                        </h4>
+                      </div>
+
+                      <div className="flex items-center shrink-0">
+                        {/* Expand Arrow Indicator */}
+                        <div 
+                          className={cn(
+                            "w-8 h-8 rounded-xl bg-white/5 border border-white/5 flex items-center justify-center text-card-identifier transition-all duration-300 group-hover:text-white group-hover:bg-white/10",
+                            expandedQuestions[rec.questionid] && "rotate-90 border-primary/20"
+                          )}
+                          style={expandedQuestions[rec.questionid] ? { 
+                            color: cardColor, 
+                            backgroundColor: `${cardColor}15`, 
+                            borderColor: `${cardColor}30` 
+                          } : {}}
+                        >
+                          <RiArrowRightSLine size={20} />
+                        </div>
                       </div>
                     </div>
-                  </div>
 
-                  {/* Collapsible Clinical Answer Options */}
-                  {expandedQuestions[rec.questionid] && (
-                    <div
-                      onClick={(e) => e.stopPropagation()} // Prevent closing when interacting inside details
-                      className="mt-4 pt-4 border-t border-white/5 space-y-3 animate-fade-in select-text"
-                    >
-                      <p className="text-[10px] font-black text-primary uppercase tracking-[0.15em] flex items-center gap-1.5">
-                        <RiListSettingsLine size={14} />
-                        <span>Opções de Resposta e Pontuação no Formulário</span>
-                      </p>
+                    {/* Collapsible Clinical Answer Options */}
+                    {expandedQuestions[rec.questionid] && (
+                      <div
+                        onClick={(e) => e.stopPropagation()} // Prevent closing when interacting inside details
+                        className="mt-4 pt-4 border-t border-white/5 space-y-3 animate-fade-in select-text"
+                      >
+                        <p className="text-[10px] font-black text-primary uppercase tracking-[0.15em] flex items-center gap-1.5">
+                          <RiListSettingsLine size={14} />
+                          <span>Opções de Resposta e Pontuação no Formulário</span>
+                        </p>
 
-                      {loadingQuestionId === rec.questionid ? (
-                        <div className="flex items-center gap-2 py-2 text-xs text-white/40 animate-pulse">
-                          <RiLoader4Line className="animate-spin" size={14} />
-                          <span>Buscando alternativas na base clínica principal...</span>
-                        </div>
-                      ) : (
-                        <div className="grid grid-cols-1 gap-2">
-                          {questionDetails[rec.questionid]?.itens?.map((item: any) => (
-                            <div key={item.id} className="flex items-center justify-between gap-4 p-3.5 bg-secondary/40 border border-white/5 rounded-xl hover:border-white/10 hover:bg-secondary/65 transition-all">
-                              <div className="flex items-start gap-2.5">
-                                <span className="w-5 h-5 rounded bg-white/5 flex items-center justify-center font-black text-white/40 text-[10px] shrink-0 border border-white/5">
-                                  {item.item_order}
+                        {loadingQuestionId === rec.questionid ? (
+                          <div className="flex items-center gap-2 py-2 text-xs text-card-code animate-pulse">
+                            <RiLoader4Line className="animate-spin" size={14} />
+                            <span>Buscando alternativas na base clínica principal...</span>
+                          </div>
+                        ) : (
+                          <div className="grid grid-cols-1 gap-2">
+                            {questionDetails[rec.questionid]?.itens?.map((item: any) => (
+                              <div key={item.id} className="flex items-center justify-between gap-4 p-3.5 bg-secondary/40 border border-white/5 rounded-xl hover:border-white/10 hover:bg-secondary/65 transition-all">
+                                <div className="flex items-start gap-2.5">
+                                  <span className="w-5 h-5 rounded bg-white/5 flex items-center justify-center font-black text-card-identifier text-[10px] shrink-0 border border-white/5">
+                                    {item.item_order}
+                                  </span>
+                                  <span className="text-xs font-semibold text-white leading-normal">{item.content}</span>
+                                </div>
+                                <span className="px-2.5 py-1 bg-white/5 border border-white/10 rounded-full font-black text-primary text-[10px] leading-none shrink-0 shadow-inner">
+                                  Pontuação: {parseFloat(item.score).toFixed(1)}
                                 </span>
-                                <span className="text-xs font-semibold text-white/80 leading-normal">{item.content}</span>
                               </div>
-                              <span className="px-2.5 py-1 bg-white/5 border border-white/10 rounded-full font-black text-primary text-[10px] leading-none shrink-0 shadow-inner">
-                                Pontuação: {parseFloat(item.score).toFixed(1)}
-                              </span>
-                            </div>
-                          ))}
-                          {(!questionDetails[rec.questionid]?.itens || questionDetails[rec.questionid]?.itens.length === 0) && (
-                            <p className="text-xs text-white/30 italic py-2">Nenhuma alternativa cadastrada para esta questão.</p>
-                          )}
-                        </div>
-                      )}
-                    </div>
-                  )}
-                </div>
-              ))}
+                            ))}
+                            {(!questionDetails[rec.questionid]?.itens || questionDetails[rec.questionid]?.itens.length === 0) && (
+                              <p className="text-xs text-card-code italic py-2">Nenhuma alternativa cadastrada para esta questão.</p>
+                            )}
+                          </div>
+                        )}
+                      </div>
+                    )}
+                  </div>
+                );
+              })}
             </div>
 
             <div className="pt-4 flex flex-col md:flex-row gap-4">
@@ -808,7 +823,7 @@ function StudioAnalysisContent() {
             </div>
             <div className="space-y-2">
               <h3 className="text-2xl font-black text-white uppercase tracking-tighter">Ops! Algo deu errado</h3>
-              <p className="text-white/40 max-w-sm mx-auto">{state.error || 'Ocorreu um erro inesperado durante o processamento.'}</p>
+              <p className="text-card-code max-w-sm mx-auto">{state.error || 'Ocorreu um erro inesperado durante o processamento.'}</p>
             </div>
             <button
               onClick={() => setState(prev => ({ ...prev, status: 'idle', error: undefined }))}
@@ -826,7 +841,7 @@ function StudioAnalysisContent() {
           </div>
           <div className="space-y-1">
             <h4 className="text-xs font-black text-blue-500 uppercase tracking-widest">Como funciona?</h4>
-            <p className="text-[11px] text-white/40 leading-relaxed">
+            <p className="text-[11px] text-card-code leading-relaxed">
               O Studio utiliza técnicas de similaridade (distância euclidiana) para encontrar perfis de pacientes semelhantes.
               As recomendações são baseadas em itens onde pacientes com evolução positiva apresentaram melhor desempenho, sugerindo focos prioritários para intervenção.
             </p>
@@ -841,8 +856,7 @@ export default function StudioAnalysis() {
   return (
     <Suspense fallback={
       <div 
-        className="min-h-screen flex flex-col items-center justify-center"
-        style={{ backgroundColor: '#0e393a' }}
+        className="min-h-screen flex flex-col items-center justify-center studio-page-bg"
       >
         <RiLoader4Line className="text-primary animate-spin" size={40} />
       </div>

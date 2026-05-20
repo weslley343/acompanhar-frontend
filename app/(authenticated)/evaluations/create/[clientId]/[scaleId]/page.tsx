@@ -154,12 +154,12 @@ export default function ScaleFilling() {
       <header className="fixed top-0 left-0 right-0 z-50 bg-secondary/80 backdrop-blur-xl border-b border-white/5">
         <div className="max-w-xl mx-auto w-full px-6 h-20 flex flex-col justify-center">
           <div className="flex items-center justify-between mb-2">
-            <button onClick={() => router.back()} className="text-white/40 hover:text-white transition-colors">
+            <button onClick={() => router.back()} className="text-card-code hover:text-white transition-colors">
               <RiArrowLeftLine size={24} />
             </button>
             <div className="text-center">
               <h1 className="text-xs font-black uppercase tracking-[0.2em] text-primary">{scale.name}</h1>
-              <p className="text-[10px] font-bold text-white/30 uppercase tracking-widest">{patient.full_name}</p>
+              <p className="text-[10px] font-bold text-card-identifier uppercase tracking-widest">{patient.full_name}</p>
             </div>
             <div className="w-6" /> {/* Spacer to keep title centered */}
           </div>
@@ -184,7 +184,7 @@ export default function ScaleFilling() {
             {/* Question Card */}
             <div className="space-y-8">
               <div className="flex items-center flex-wrap gap-3">
-                <span className="px-3 py-1 bg-white/5 border border-white/5 rounded-full text-[10px] font-black uppercase tracking-widest text-white/40">
+                <span className="px-3 py-1 bg-white/5 border border-white/5 rounded-full text-[10px] font-black uppercase tracking-widest text-card-identifier">
                   Questão {currentIndex + 1} de {totalQuestions}
                 </span>
                 {currentQuestion?.domain && !currentQuestion.domain.toLowerCase().includes('pontuação') && (
@@ -244,7 +244,7 @@ export default function ScaleFilling() {
           <div className="flex-1 flex flex-col space-y-8 animate-fade-in-up">
             <div className="space-y-2">
               <h2 className="text-4xl font-black tracking-tighter">Revisão</h2>
-              <p className="text-white/40 text-sm">Verifique se todas as questões foram respondidas antes de finalizar.</p>
+              <p className="text-card-code text-sm">Verifique se todas as questões foram respondidas antes de finalizar.</p>
             </div>
 
             {/* Error & Pendency Alerts */}
@@ -297,7 +297,7 @@ export default function ScaleFilling() {
 
             {/* Observations Input */}
             <div className="space-y-4 pt-4">
-              <div className="flex items-center gap-2 text-white/40">
+              <div className="flex items-center gap-2 text-card-identifier">
                 <RiStickyNoteLine size={18} />
                 <h4 className="text-[10px] font-black uppercase tracking-widest">Observações Clínicas</h4>
               </div>
@@ -305,7 +305,7 @@ export default function ScaleFilling() {
                 value={notes}
                 onChange={(e) => setNotes(e.target.value)}
                 placeholder="Insira aqui observações qualitativas sobre o comportamento do paciente durante a avaliação..."
-                className="w-full min-h-[150px] bg-tertiary border border-white/5 rounded-[2rem] p-6 text-sm text-white/70 placeholder:text-white/10 focus:border-primary/30 focus:bg-primary/5 transition-all outline-none resize-none"
+                className="w-full min-h-[150px] bg-tertiary border border-white/5 rounded-[2rem] p-6 text-sm text-white placeholder:text-card-code focus:border-primary/30 focus:bg-primary/5 transition-all outline-none resize-none"
               />
             </div>
           </div>

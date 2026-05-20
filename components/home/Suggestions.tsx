@@ -227,15 +227,15 @@ export default function Suggestions() {
               <div
                 key={suggestion.id}
                 className={cn(
-                  "bg-tertiary/40 border border-white/5 p-6 rounded-[2rem] space-y-4 transition-all hover:border-white/10",
-                  suggestion.status === 'responded' ? "border-l-4 border-l-green-500/50" : "border-l-4 border-l-yellow-500/50"
+                  "bg-tertiary border border-white/5 p-6 rounded-[2rem] space-y-4 transition-all hover:border-white/10",
+                  suggestion.status === 'responded' ? "border-l-4 border-l-green-500/50" : "border-l-4 border-l-orange-500/50"
                 )}
               >
                 <div className="flex items-start justify-between gap-4">
                   <div className="space-y-2">
                     <div className="flex items-center gap-2 mb-2">
                       <RiUserStarLine size={14} className="text-primary" />
-                      <span className="text-[10px] font-black text-white/60 uppercase">
+                      <span className="text-[10px] font-black text-card-identifier uppercase">
                         {suggestion.professionals?.full_name || suggestion.responsibles?.full_name || 'Usuário'}
                       </span>
                     </div>
@@ -297,7 +297,7 @@ export default function Suggestions() {
 
                 <div className="flex items-center justify-between pt-2">
                   <div className="flex items-center gap-4">
-                    <div className="flex items-center gap-1.5 text-white/20">
+                    <div className="flex items-center gap-1.5 text-card-code">
                       <RiTimeLine size={12} />
                       <span className="text-[9px] font-bold uppercase">
                         {format(new Date(suggestion.created_at), "dd 'de' MMM, yyyy", { locale: ptBR })}
@@ -307,7 +307,7 @@ export default function Suggestions() {
 
                   <div className={cn(
                     "px-3 py-1 rounded-full flex items-center gap-1.5",
-                    suggestion.status === 'responded' ? "bg-green-500/10 text-green-400" : "bg-yellow-500/10 text-yellow-400"
+                    suggestion.status === 'responded' ? "bg-green-500/10 text-green-600 dark:text-green-400" : "bg-orange-500/10 text-orange-600 dark:text-orange-400"
                   )}>
                     {suggestion.status === 'responded' ? <RiCheckboxCircleLine size={12} /> : <RiTimeLine size={12} />}
                     <span className="text-[9px] font-black uppercase tracking-widest">

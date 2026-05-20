@@ -171,14 +171,14 @@ export default function ProfessionalList() {
                     <p className="text-primary/60 text-xs font-black uppercase tracking-widest mt-1">{prof.specialty}</p>
                   </div>
 
-                  <div className="space-y-2">
-                    <div className="flex items-center gap-2 text-white/30 text-xs">
-                      <RiMailLine className="shrink-0" />
-                      <span className="truncate">{prof.email}</span>
+                  <div className="flex flex-col mt-2 gap-0.5">
+                    <div className="flex items-center gap-1.5 text-[10px] text-card-identifier uppercase tracking-widest font-black truncate">
+                      <RiHashtag className="shrink-0" size={12} />
+                      <span className="truncate">{prof.identifier || 'Sem registro'}</span>
                     </div>
-                    <div className="flex items-center gap-2 text-white/30 text-xs">
-                      <RiHashtag className="shrink-0" />
-                      <span>{prof.identifier || 'Sem registro'}</span>
+                    <div className="flex items-center gap-1.5 text-[10px] text-card-code uppercase tracking-widest font-black truncate">
+                      <RiMailLine className="shrink-0" size={12} />
+                      <span className="truncate">{prof.email}</span>
                     </div>
                   </div>
                 </div>

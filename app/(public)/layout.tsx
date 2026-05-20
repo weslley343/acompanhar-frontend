@@ -3,6 +3,7 @@
 import { useEffect, useState } from 'react';
 import { useRouter, usePathname } from 'next/navigation';
 import { useAuthStore } from '@/lib/stores/store';
+import ThemeToggle from '@/components/ui/ThemeToggle';
 
 export default function PublicLayout({
   children,
@@ -27,5 +28,12 @@ export default function PublicLayout({
     }
   }, [isHydrated, isAuthenticated, router, pathname]);
 
-  return <>{children}</>;
+  return (
+    <>
+      <div className="fixed top-6 right-6 z-50 animate-fade-in">
+        <ThemeToggle />
+      </div>
+      {children}
+    </>
+  );
 }

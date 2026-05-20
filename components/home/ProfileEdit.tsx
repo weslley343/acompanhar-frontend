@@ -222,7 +222,7 @@ export default function ProfileEdit() {
               className="w-full bg-white/5 border border-white/10 rounded-2xl py-4 px-6 text-white focus:outline-none focus:ring-2 focus:ring-primary/50 focus:border-primary/50 transition-all opacity-60"
               disabled
             />
-            <p className="text-[10px] text-white/30 ml-1 italic">O email não pode ser alterado diretamente.</p>
+            <p className="text-[10px] text-white/50 ml-1 italic">O email não pode ser alterado diretamente.</p>
           </div>
 
           <div className="space-y-2">

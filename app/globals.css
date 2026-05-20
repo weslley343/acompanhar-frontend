@@ -1,11 +1,44 @@
 @import "tailwindcss";
 
 :root {
+  /* LIGHT THEME (Default) */
+  --background: #ffffff;
+  --foreground: #0f172a;
+  --primary: #55b6b0;
+  /* Slate-compliant teal for good contrast */
+  --secondary: #f8fafc;
+  --tertiary: #e2e8f0; /* Slate 200 - Mais escuro para melhor contraste */
+  --secondary-dark: #0f172a;
+
+  /* Adaptive color states for light theme */
+  --adaptive-white: #0f172a;
+  
+  /* Patient Card Specific Colors */
+  --card-identifier: #475569; /* Slate 600 - Escuro e elegante */
+  --card-code: #64748b; /* Slate 500 - Sutilmente mais claro */
+  --adaptive-white-muted: #898989;
+  /* Tom cinza exato solicitado */
+  --adaptive-white-very-muted: rgba(137, 137, 137, 0.5);
+  /* #898989 com 50% de opacidade */
+}
+
+.dark {
+  /* DARK THEME */
   --background: #070707;
   --foreground: #ffffff;
   --primary: #64CDC7;
   --secondary: #070707;
   --tertiary: #141414;
+  --secondary-dark: #050505;
+
+  /* Adaptive color states for dark theme */
+  --adaptive-white: #ffffff;
+  
+  /* Patient Card Specific Colors */
+  --card-identifier: rgba(255, 255, 255, 0.6);
+  --card-code: rgba(255, 255, 255, 0.5);
+  --adaptive-white-muted: rgba(255, 255, 255, 0.4);
+  --adaptive-white-very-muted: rgba(255, 255, 255, 0.2);
 }
 
 @theme inline {
@@ -14,6 +47,22 @@
   --color-primary: var(--primary);
   --color-secondary: var(--secondary);
   --color-tertiary: var(--tertiary);
+  --color-secondary-dark: var(--secondary-dark);
+
+  /* Overriding default white classes to be dynamically adaptive */
+  --color-white: var(--adaptive-white);
+  
+  /* Patient Card Custom Colors */
+  --color-card-identifier: var(--card-identifier);
+  --color-card-code: var(--card-code);
+
+  --color-white-60: var(--adaptive-white-muted);
+  --color-white-50: var(--adaptive-white-muted);
+  --color-white-40: var(--adaptive-white-muted);
+  --color-white-30: var(--adaptive-white-very-muted);
+  --color-white-20: var(--adaptive-white-very-muted);
+  --color-white-10: var(--adaptive-white-very-muted);
+
   --font-sans: var(--font-geist-sans);
   --font-mono: var(--font-geist-mono);
   --animation-fade-in-up: fade-in-up 0.8s ease-out forwards;
@@ -24,16 +73,10 @@
     opacity: 0;
     transform: translateY(20px);
   }
+
   to {
     opacity: 1;
     transform: translateY(0);
-  }
-}
-
-@media (prefers-color-scheme: dark) {
-  :root {
-    --background: #070707;
-    --foreground: #ffffff;
   }
 }
 
@@ -41,4 +84,24 @@ body {
   background: var(--background);
   color: var(--foreground);
   font-family: Arial, Helvetica, sans-serif;
+  transition: background-color 0.3s ease, color 0.3s ease, border-color 0.3s ease;
+}
+
+/* Studio custom theme-aware background gradients */
+.studio-page-bg {
+  background: radial-gradient(circle at 100% 0%, rgba(85, 182, 176, 0.15), transparent 50%), radial-gradient(circle at 0% 100%, rgba(85, 182, 176, 0.1), transparent 50%), #f8fafc;
+}
+
+.dark .studio-page-bg {
+  background: radial-gradient(circle at 100% 0%, rgba(20, 110, 112, 0.25), transparent 50%), radial-gradient(circle at 0% 100%, rgba(14, 57, 58, 0.5), transparent 50%), #0e393a;
+}
+
+.studio-header-bg {
+  background-color: rgba(248, 250, 252, 0.8);
+  backdrop-filter: blur(24px);
+}
+
+.dark .studio-header-bg {
+  background-color: rgba(14, 57, 58, 0.8);
+  backdrop-filter: blur(24px);
 }
