@@ -134,17 +134,17 @@ export default function ProgressChart({ evaluations, scaleName }: ProgressChartP
               onClick={() => toggleArea('total')}
               className="flex items-center gap-1.5 px-2.5 py-1.5 rounded-lg transition-all border text-[10px] font-bold uppercase tracking-wider"
               style={{
-                backgroundColor: isTotalHidden ? 'transparent' : 'rgba(255,255,255,0.08)',
-                borderColor: isTotalHidden ? 'rgba(255,255,255,0.05)' : 'rgba(255,255,255,0.15)',
-                color: isTotalHidden ? 'rgba(255,255,255,0.25)' : 'rgba(255,255,255,0.8)',
+                backgroundColor: isTotalHidden ? 'transparent' : 'rgba(245,158,11,0.1)',
+                borderColor: isTotalHidden ? 'rgba(255,255,255,0.05)' : 'rgba(245,158,11,0.3)',
+                color: isTotalHidden ? 'rgba(255,255,255,0.25)' : '#F59E0B',
                 opacity: isTotalHidden ? 0.5 : 1,
               }}
             >
               <div
                 className="w-4 h-0.5 rounded-full"
                 style={{
-                  backgroundColor: isTotalHidden ? 'rgba(255,255,255,0.2)' : 'rgba(255,255,255,0.8)',
-                  borderTop: isTotalHidden ? 'none' : '2px dashed rgba(255,255,255,0.8)',
+                  backgroundColor: isTotalHidden ? 'rgba(255,255,255,0.2)' : '#F59E0B',
+                  borderTop: isTotalHidden ? 'none' : '2px dashed #F59E0B',
                   height: 0,
                 }}
               />
@@ -263,11 +263,11 @@ export default function ProgressChart({ evaluations, scaleName }: ProgressChartP
                 <Line
                   type="monotone"
                   dataKey="total"
-                  stroke="rgba(255,255,255,0.6)"
-                  strokeWidth={2}
+                  stroke="#F59E0B"
+                  strokeWidth={2.5}
                   strokeDasharray="6 4"
-                  dot={{ r: 3, fill: '#fff', strokeWidth: 2, stroke: '#161622' }}
-                  activeDot={{ r: 5, strokeWidth: 0, fill: '#fff' }}
+                  dot={{ r: 3, fill: '#F59E0B', strokeWidth: 2, stroke: '#161622' }}
+                  activeDot={{ r: 5, strokeWidth: 0, fill: '#F59E0B' }}
                   animationDuration={1200}
                   name="Total"
                 />
