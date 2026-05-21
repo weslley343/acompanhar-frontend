@@ -277,50 +277,50 @@ export default function PatientHistory() {
                 <div 
                   key={ev.id}
                   onClick={() => router.push(`/evaluations/view/${ev.id}`)}
-                  className="group bg-tertiary hover:bg-tertiary/80 border border-white/5 hover:border-primary/20 rounded-[2rem] p-6 transition-all duration-300 cursor-pointer flex items-center gap-5 relative overflow-hidden shadow-lg"
+                  className="group bg-tertiary hover:bg-tertiary/80 border border-white/5 hover:border-primary/20 rounded-2xl p-4 transition-all duration-300 cursor-pointer flex items-start gap-3 relative overflow-hidden shadow-lg"
                 >
                   {/* Decorative accent */}
                   <div className="absolute top-0 left-0 w-1 h-full bg-primary/20 group-hover:bg-primary transition-colors" />
                   
-                  <div className="w-14 h-14 rounded-2xl bg-secondary flex items-center justify-center text-primary group-hover:scale-110 group-hover:bg-primary/10 transition-all shrink-0">
-                    <RiFileCopyLine size={28} />
+                  <div className="w-10 h-10 rounded-xl bg-secondary flex items-center justify-center text-primary group-hover:scale-110 group-hover:bg-primary/10 transition-all shrink-0 mt-0.5">
+                    <RiFileCopyLine size={20} />
                   </div>
                   
-                  <div className="flex-1 min-w-0 space-y-1">
-                    <div className="flex flex-wrap items-center gap-2">
-                      <span className="px-2.5 py-0.5 bg-primary/10 text-primary text-[10px] font-black rounded-lg uppercase tracking-widest border border-primary/5">
+                  <div className="flex-1 min-w-0 space-y-0.5">
+                    <div className="flex flex-wrap items-center gap-1.5">
+                      <span className="px-2 py-0.5 bg-primary/10 text-primary text-[9px] font-black rounded-md uppercase tracking-widest border border-primary/5">
                         {ev.scales?.name}
                       </span>
-                      <span className="flex items-center gap-1.5 text-white/20 text-[10px] font-bold uppercase tracking-widest">
-                        <RiCalendarLine size={12} />
+                      <span className="flex items-center gap-1 text-white/20 text-[9px] font-bold uppercase tracking-widest">
+                        <RiCalendarLine size={10} />
                         {new Date(ev.created_at).toLocaleDateString('pt-BR')}
                       </span>
                     </div>
                     
-                    <h4 className="text-lg font-black text-white group-hover:text-primary transition-colors truncate tracking-tight">
+                    <h4 className="text-sm font-black text-white group-hover:text-primary transition-colors tracking-tight leading-snug">
                       {ev.title}
                     </h4>
                     
-                    <div className="flex items-center gap-2 text-white/30">
-                      <div className="w-5 h-5 rounded-full bg-white/5 flex items-center justify-center">
-                        <RiUser3Line size={10} />
+                    <div className="flex items-center gap-1.5 text-white/30">
+                      <div className="w-4 h-4 rounded-full bg-white/5 flex items-center justify-center">
+                        <RiUser3Line size={8} />
                       </div>
-                      <p className="text-[11px] truncate">
+                      <p className="text-[10px] truncate">
                         Por: <span className="text-white/50 font-bold">{ev.professionals?.full_name}</span>
                       </p>
                     </div>
                   </div>
                   
-                  <div className="flex items-center gap-2">
+                  <div className="flex items-center gap-1.5 shrink-0">
                     <button
                       onClick={(e) => {
                         e.stopPropagation();
                         router.push(`/studio/analysis/${ev.id}?clientId=${ev.client_fk}&scaleId=${ev.scale_fk}`);
                       }}
-                      className="p-3 bg-white/5 hover:bg-primary/10 hover:text-primary rounded-2xl transition-all active:scale-95 z-20"
+                      className="p-2 bg-white/5 hover:bg-primary/10 hover:text-primary rounded-xl transition-all active:scale-95 z-20"
                       title="Abrir no Studio"
                     >
-                      <RiRocketLine size={20} />
+                      <RiRocketLine size={16} />
                     </button>
                     
                     {(user?.role === 'admin' || user?.id === ev.professional_fk) && (
@@ -330,14 +330,14 @@ export default function PatientHistory() {
                           setEvaluationToDelete(ev);
                           setIsDeleteModalOpen(true);
                         }}
-                        className="p-3 bg-white/5 hover:bg-red-500/10 hover:text-red-500 rounded-2xl transition-all active:scale-95 z-20"
+                        className="p-2 bg-white/5 hover:bg-red-500/10 hover:text-red-500 rounded-xl transition-all active:scale-95 z-20"
                         title="Excluir Avaliação"
                       >
-                        <RiDeleteBinLine size={20} />
+                        <RiDeleteBinLine size={16} />
                       </button>
                     )}
 
-                    <RiArrowRightSLine className="text-white/10 group-hover:text-primary group-hover:translate-x-1 transition-all shrink-0 ml-1" size={24} />
+                    <RiArrowRightSLine className="text-white/10 group-hover:text-primary group-hover:translate-x-1 transition-all shrink-0 hidden sm:block" size={20} />
                   </div>
                 </div>
               ))
