@@ -100,11 +100,14 @@ export default function ProgressChart({ evaluations, scaleName }: ProgressChartP
         </div>
       </div>
 
-      <div className="w-full h-[400px] bg-tertiary/40 border border-white/5 p-6 rounded-[2.5rem] relative overflow-hidden group">
+      <div className="w-full bg-tertiary/40 border border-white/5 rounded-[2.5rem] relative group">
         {/* Efeito de vidro no fundo */}
-        <div className="absolute top-0 right-0 w-64 h-64 bg-primary/5 blur-[100px] -z-10 pointer-events-none" />
+        <div className="absolute inset-0 overflow-hidden rounded-[2.5rem] pointer-events-none">
+          <div className="absolute top-0 right-0 w-64 h-64 bg-primary/5 blur-[100px]" />
+        </div>
         
-        <ResponsiveContainer width="100%" height="100%">
+        <div className="p-6">
+        <ResponsiveContainer width="100%" height={360}>
           <LineChart data={chartData} margin={{ top: 20, right: 20, left: -20, bottom: 20 }}>
             <CartesianGrid strokeDasharray="3 3" vertical={false} stroke="rgba(255,255,255,0.05)" />
             <XAxis 
@@ -160,6 +163,7 @@ export default function ProgressChart({ evaluations, scaleName }: ProgressChartP
             ))}
           </LineChart>
         </ResponsiveContainer>
+        </div>
       </div>
     </div>
   );

@@ -44,6 +44,26 @@ export default function PatientHistory() {
   const [evaluationToDelete, setEvaluationToDelete] = useState<EvaluationResponse | null>(null);
   const [deleting, setDeleting] = useState(false);
 
+  const fetchScales = async () => {
+    if (!id) return;
+    setFetchingScales(true);
+    try {
+      const data = await scaleService.getClientScales(id as string);
+      setScales(data);
+      // Reset filter if the selected scale is no longer in the list of used scales
+      setScaleFilter(prev => {
+        if (prev && !data.some(s => s.name === prev)) {
+          return '';
+        }
+        return prev;
+      });
+    } catch (err) {
+      console.error('Error fetching scales:', err);
+    } finally {
+      setFetchingScales(false);
+    }
+  };
+
   useEffect(() => {
     const fetchPatient = async () => {
       try {
@@ -57,18 +77,6 @@ export default function PatientHistory() {
         }
       } finally {
         setLoadingPatient(false);
-      }
-    };
-
-    const fetchScales = async () => {
-      setFetchingScales(true);
-      try {
-        const data = await scaleService.getScales();
-        setScales(data);
-      } catch (err) {
-        console.error('Error fetching scales:', err);
-      } finally {
-        setFetchingScales(false);
       }
     };
 
@@ -111,6 +119,7 @@ export default function PatientHistory() {
       setIsDeleteModalOpen(false);
       setEvaluationToDelete(null);
       fetchEvaluations(page);
+      fetchScales();
     } catch (err: any) {
       alert(err.response?.data?.error || 'Erro ao excluir avaliação.');
     } finally {
@@ -157,59 +166,61 @@ export default function PatientHistory() {
       ) : (
         <main className="max-w-4xl w-full mx-auto px-6 py-8 space-y-8 animate-fade-in-up">
         {/* Scale Filter Choices */}
-        <section className="bg-tertiary border border-white/5 rounded-[2.5rem] p-6 space-y-6 shadow-xl relative overflow-hidden group">
-          <div className="absolute top-0 right-0 p-6 text-primary/5 -rotate-12 translate-x-4 -translate-y-4 group-hover:scale-110 transition-transform">
-            <RiHistoryLine size={100} />
-          </div>
+        {!fetchingScales && scales.length === 0 ? null : (
+          <section className="bg-tertiary border border-white/5 rounded-[2.5rem] p-6 space-y-6 shadow-xl relative overflow-hidden group">
+            <div className="absolute top-0 right-0 p-6 text-primary/5 -rotate-12 translate-x-4 -translate-y-4 group-hover:scale-110 transition-transform">
+              <RiHistoryLine size={100} />
+            </div>
 
-          <div className="relative space-y-4">
-            <div className="flex items-center gap-3 text-primary">
-              <RiSearchLine size={20} />
-              <h3 className="text-sm font-black uppercase tracking-widest">Filtrar por Escala</h3>
-            </div>
-            
-            <div className="flex flex-wrap gap-2 pt-2">
-              <button
-                onClick={() => {
-                  setScaleFilter('');
-                  setPage(1);
-                }}
-                className={cn(
-                  "px-5 py-2.5 rounded-xl text-xs font-black uppercase tracking-widest transition-all border",
-                  scaleFilter === '' 
-                    ? "bg-primary text-secondary-dark border-primary shadow-lg shadow-primary/20" 
-                    : "bg-white/5 text-white/40 border-white/5 hover:bg-white/10"
-                )}
-              >
-                Todas
-              </button>
+            <div className="relative space-y-4">
+              <div className="flex items-center gap-3 text-primary">
+                <RiSearchLine size={20} />
+                <h3 className="text-sm font-black uppercase tracking-widest">Filtrar por Escala</h3>
+              </div>
               
-              {fetchingScales ? (
-                Array.from({ length: 3 }).map((_, i) => (
-                  <div key={i} className="w-20 h-9 bg-white/5 rounded-xl animate-pulse" />
-                ))
-              ) : (
-                scales.map((scale) => (
-                  <button
-                    key={scale.id}
-                    onClick={() => {
-                      setScaleFilter(scale.name);
-                      setPage(1);
-                    }}
-                    className={cn(
-                      "px-5 py-2.5 rounded-xl text-xs font-black uppercase tracking-widest transition-all border",
-                      scaleFilter === scale.name 
-                        ? "bg-primary text-secondary-dark border-primary shadow-lg shadow-primary/20" 
-                        : "bg-white/5 text-white/40 border-white/5 hover:bg-white/10"
-                    )}
-                  >
-                    {scale.name}
-                  </button>
-                ))
-              )}
+              <div className="flex flex-wrap gap-2 pt-2">
+                <button
+                  onClick={() => {
+                    setScaleFilter('');
+                    setPage(1);
+                  }}
+                  className={cn(
+                    "px-5 py-2.5 rounded-xl text-xs font-black uppercase tracking-widest transition-all border",
+                    scaleFilter === '' 
+                      ? "bg-primary text-secondary-dark border-primary shadow-lg shadow-primary/20" 
+                      : "bg-white/5 text-white/40 border-white/5 hover:bg-white/10"
+                  )}
+                >
+                  Todas
+                </button>
+                
+                {fetchingScales ? (
+                  Array.from({ length: 3 }).map((_, i) => (
+                    <div key={i} className="w-20 h-9 bg-white/5 rounded-xl animate-pulse" />
+                  ))
+                ) : (
+                  scales.map((scale) => (
+                    <button
+                      key={scale.id}
+                      onClick={() => {
+                        setScaleFilter(scale.name);
+                        setPage(1);
+                      }}
+                      className={cn(
+                        "px-5 py-2.5 rounded-xl text-xs font-black uppercase tracking-widest transition-all border",
+                        scaleFilter === scale.name 
+                          ? "bg-primary text-secondary-dark border-primary shadow-lg shadow-primary/20" 
+                          : "bg-white/5 text-white/40 border-white/5 hover:bg-white/10"
+                      )}
+                    >
+                      {scale.name}
+                    </button>
+                  ))
+                )}
+              </div>
             </div>
-          </div>
-        </section>
+          </section>
+        )}
 
         {/* Progress Chart Section */}
         {scaleFilter && (

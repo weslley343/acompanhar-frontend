@@ -12,8 +12,14 @@ export const scaleService = {
     return response.data;
   },
 
+  async getClientScales(clientId: string): Promise<Scale[]> {
+    const response = await api.get<{ data: Scale[] }>(`/clients/${clientId}/scales`);
+    return response.data.data;
+  },
+
   async getQuestionById(id: number | string): Promise<any> {
     const response = await api.get<any>(`/questions/${id}`);
     return response.data;
   }
 };
+
