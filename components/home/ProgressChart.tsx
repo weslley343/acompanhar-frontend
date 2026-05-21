@@ -1,18 +1,18 @@
 'use client';
 
-import React, { useMemo } from 'react';
+import React, { useMemo, useState, useCallback } from 'react';
 import {
-  LineChart,
+  AreaChart,
+  Area,
   Line,
   XAxis,
   YAxis,
   CartesianGrid,
   Tooltip,
   ResponsiveContainer,
-  Legend
 } from 'recharts';
 import { EvaluationResponse } from '@/types/evaluation';
-import { RiInformationLine, RiLineChartLine } from 'react-icons/ri';
+import { RiInformationLine, RiLineChartLine, RiEyeLine, RiEyeOffLine } from 'react-icons/ri';
 
 interface ProgressChartProps {
   evaluations: EvaluationResponse[];
@@ -20,6 +20,8 @@ interface ProgressChartProps {
 }
 
 export default function ProgressChart({ evaluations, scaleName }: ProgressChartProps) {
+  const [hiddenAreas, setHiddenAreas] = useState<Set<string>>(new Set());
+
   // Se "Todas" as escalas estiverem selecionadas, não mostramos o gráfico (conforme solicitado)
   if (!scaleName || scaleName === 'Todas') {
     return null;
@@ -84,7 +86,24 @@ export default function ProgressChart({ evaluations, scaleName }: ProgressChartP
     '#FF9900', // Orange
     '#00FF94', // Green
     '#FF3D00', // Red
+    '#FFD700', // Gold
+    '#00BFFF', // Deep Sky Blue
   ];
+
+  const toggleArea = useCallback((area: string) => {
+    setHiddenAreas(prev => {
+      const next = new Set(prev);
+      if (next.has(area)) {
+        next.delete(area);
+      } else {
+        next.add(area);
+      }
+      return next;
+    });
+  }, []);
+
+  const visibleAreas = areas.filter(a => !hiddenAreas.has(a));
+  const isTotalHidden = hiddenAreas.has('total');
 
   return (
     <div className="space-y-6 animate-fade-in-up">
@@ -106,63 +125,155 @@ export default function ProgressChart({ evaluations, scaleName }: ProgressChartP
           <div className="absolute top-0 right-0 w-64 h-64 bg-primary/5 blur-[100px]" />
         </div>
         
-        <div className="p-6">
-        <ResponsiveContainer width="100%" height={360}>
-          <LineChart data={chartData} margin={{ top: 20, right: 20, left: -20, bottom: 20 }}>
-            <CartesianGrid strokeDasharray="3 3" vertical={false} stroke="rgba(255,255,255,0.05)" />
-            <XAxis 
-              dataKey="name" 
-              axisLine={false} 
-              tickLine={false} 
-              tick={{ fill: 'rgba(255,255,255,0.4)', fontSize: 10, fontWeight: 700 }}
-              dy={15}
-            />
-            <YAxis 
-              axisLine={false} 
-              tickLine={false} 
-              tick={{ fill: 'rgba(255,255,255,0.4)', fontSize: 10, fontWeight: 700 }}
-            />
-            <Tooltip 
-              contentStyle={{ 
-                backgroundColor: '#161622', 
-                border: '1px solid rgba(255,255,255,0.1)',
-                borderRadius: '20px',
-                padding: '16px',
-                boxShadow: '0 25px 50px -12px rgba(0,0,0,0.5)'
+        <div className="p-4 sm:p-6">
+          {/* Custom interactive legend */}
+          <div className="flex flex-wrap gap-2 justify-center mb-4 px-2">
+            {/* Total score toggle */}
+            <button
+              type="button"
+              onClick={() => toggleArea('total')}
+              className="flex items-center gap-1.5 px-2.5 py-1.5 rounded-lg transition-all border text-[10px] font-bold uppercase tracking-wider"
+              style={{
+                backgroundColor: isTotalHidden ? 'transparent' : 'rgba(255,255,255,0.08)',
+                borderColor: isTotalHidden ? 'rgba(255,255,255,0.05)' : 'rgba(255,255,255,0.15)',
+                color: isTotalHidden ? 'rgba(255,255,255,0.25)' : 'rgba(255,255,255,0.8)',
+                opacity: isTotalHidden ? 0.5 : 1,
               }}
-              itemStyle={{ fontSize: '12px', fontWeight: 700, padding: '2px 0' }}
-              labelStyle={{ color: 'rgba(255,255,255,0.4)', fontSize: '10px', marginBottom: '8px', fontWeight: 800, textTransform: 'uppercase', letterSpacing: '0.1em' }}
-            />
-            <Legend 
-              verticalAlign="top" 
-              height={50}
-              content={({ payload }) => (
-                <div className="flex flex-wrap gap-4 justify-center mb-8">
-                  {payload?.map((entry: any, index: number) => (
-                    <div key={`item-${index}`} className="flex items-center gap-2">
-                      <div className="w-3 h-3 rounded-full" style={{ backgroundColor: entry.color }} />
-                      <span className="text-[10px] font-bold text-white/60 uppercase tracking-wider">{entry.value}</span>
-                    </div>
-                  ))}
-                </div>
-              )}
-            />
-            
-            {areas.map((area, index) => (
-              <Line
-                key={area}
-                type="monotone"
-                dataKey={area}
-                stroke={colors[index % colors.length]}
-                strokeWidth={3}
-                dot={{ r: 4, fill: colors[index % colors.length], strokeWidth: 2, stroke: '#161622' }}
-                activeDot={{ r: 6, strokeWidth: 0 }}
-                animationDuration={1500}
-                name={area}
+            >
+              <div
+                className="w-4 h-0.5 rounded-full"
+                style={{
+                  backgroundColor: isTotalHidden ? 'rgba(255,255,255,0.2)' : 'rgba(255,255,255,0.8)',
+                  borderTop: isTotalHidden ? 'none' : '2px dashed rgba(255,255,255,0.8)',
+                  height: 0,
+                }}
               />
-            ))}
-          </LineChart>
-        </ResponsiveContainer>
+              <span>Total</span>
+              {isTotalHidden ? <RiEyeOffLine size={10} /> : <RiEyeLine size={10} />}
+            </button>
+
+            {areas.map((area, index) => {
+              const isHidden = hiddenAreas.has(area);
+              const color = colors[index % colors.length];
+              return (
+                <button
+                  type="button"
+                  key={area}
+                  onClick={() => toggleArea(area)}
+                  className="flex items-center gap-1.5 px-2.5 py-1.5 rounded-lg transition-all border text-[10px] font-bold uppercase tracking-wider"
+                  style={{
+                    backgroundColor: isHidden ? 'transparent' : `${color}10`,
+                    borderColor: isHidden ? 'rgba(255,255,255,0.05)' : `${color}30`,
+                    color: isHidden ? 'rgba(255,255,255,0.25)' : color,
+                    opacity: isHidden ? 0.5 : 1,
+                  }}
+                >
+                  <div
+                    className="w-2.5 h-2.5 rounded-full"
+                    style={{ backgroundColor: isHidden ? 'rgba(255,255,255,0.2)' : color }}
+                  />
+                  <span>{area}</span>
+                  {isHidden ? <RiEyeOffLine size={10} /> : <RiEyeLine size={10} />}
+                </button>
+              );
+            })}
+          </div>
+
+          <ResponsiveContainer width="100%" height={320}>
+            <AreaChart data={chartData} margin={{ top: 10, right: 10, left: -20, bottom: 10 }}>
+              <defs>
+                {areas.map((area, index) => {
+                  const color = colors[index % colors.length];
+                  return (
+                    <linearGradient key={`grad-${area}`} id={`gradient-${index}`} x1="0" y1="0" x2="0" y2="1">
+                      <stop offset="0%" stopColor={color} stopOpacity={0.15} />
+                      <stop offset="100%" stopColor={color} stopOpacity={0} />
+                    </linearGradient>
+                  );
+                })}
+              </defs>
+
+              <CartesianGrid strokeDasharray="3 3" vertical={false} stroke="rgba(255,255,255,0.05)" />
+              <XAxis 
+                dataKey="name" 
+                axisLine={false} 
+                tickLine={false} 
+                tick={{ fill: 'rgba(255,255,255,0.4)', fontSize: 10, fontWeight: 700 }}
+                dy={10}
+              />
+              <YAxis 
+                axisLine={false} 
+                tickLine={false} 
+                tick={{ fill: 'rgba(255,255,255,0.4)', fontSize: 10, fontWeight: 700 }}
+                width={40}
+              />
+              <Tooltip 
+                contentStyle={{ 
+                  backgroundColor: '#161622', 
+                  border: '1px solid rgba(255,255,255,0.1)',
+                  borderRadius: '16px',
+                  padding: '12px 16px',
+                  boxShadow: '0 25px 50px -12px rgba(0,0,0,0.5)',
+                  fontSize: '11px',
+                }}
+                itemStyle={{ fontSize: '11px', fontWeight: 700, padding: '2px 0' }}
+                labelStyle={{ color: 'rgba(255,255,255,0.4)', fontSize: '10px', marginBottom: '6px', fontWeight: 800, textTransform: 'uppercase', letterSpacing: '0.1em' }}
+              />
+
+              {/* Area fills (behind lines) for visible domains */}
+              {visibleAreas.map((area, i) => {
+                const globalIndex = areas.indexOf(area);
+                return (
+                  <Area
+                    key={`area-${area}`}
+                    type="monotone"
+                    dataKey={area}
+                    stroke="none"
+                    fill={`url(#gradient-${globalIndex})`}
+                    fillOpacity={1}
+                    animationDuration={1200}
+                    name={`_area_${area}`}
+                    legendType="none"
+                    tooltipType="none"
+                  />
+                );
+              })}
+
+              {/* Domain lines */}
+              {visibleAreas.map((area) => {
+                const globalIndex = areas.indexOf(area);
+                const color = colors[globalIndex % colors.length];
+                return (
+                  <Line
+                    key={`line-${area}`}
+                    type="monotone"
+                    dataKey={area}
+                    stroke={color}
+                    strokeWidth={2}
+                    dot={{ r: 3, fill: color, strokeWidth: 2, stroke: '#161622' }}
+                    activeDot={{ r: 5, strokeWidth: 0, fill: color }}
+                    animationDuration={1200}
+                    name={area}
+                  />
+                );
+              })}
+
+              {/* Total score line — dashed, prominent */}
+              {!isTotalHidden && (
+                <Line
+                  type="monotone"
+                  dataKey="total"
+                  stroke="rgba(255,255,255,0.6)"
+                  strokeWidth={2}
+                  strokeDasharray="6 4"
+                  dot={{ r: 3, fill: '#fff', strokeWidth: 2, stroke: '#161622' }}
+                  activeDot={{ r: 5, strokeWidth: 0, fill: '#fff' }}
+                  animationDuration={1200}
+                  name="Total"
+                />
+              )}
+            </AreaChart>
+          </ResponsiveContainer>
         </div>
       </div>
     </div>
