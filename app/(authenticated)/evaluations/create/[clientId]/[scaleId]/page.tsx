@@ -5,6 +5,7 @@ import { useParams, useRouter } from 'next/navigation';
 import { scaleService } from '@/lib/api/scales';
 import { clientService } from '@/lib/api/clients';
 import { evaluationService } from '@/lib/api/evaluations';
+import { useAuthStore } from '@/lib/stores/store';
 import { Scale, Question, Item } from '@/types/scale';
 import { Client } from '@/types/client';
 import { 
@@ -23,6 +24,7 @@ import SuccessModal from '@/components/ui/SuccessModal';
 export default function ScaleFilling() {
   const { clientId, scaleId } = useParams();
   const router = useRouter();
+  const { user } = useAuthStore();
   
   const [scale, setScale] = useState<Scale | null>(null);
   const [patient, setPatient] = useState<Client | null>(null);
@@ -97,7 +99,7 @@ export default function ScaleFilling() {
 
     try {
       const payload = {
-        title: `${scale.name} - Avaliação`,
+        title: `${scale.name} - Avaliação (${user?.identifier || 'Profissional'})`,
         client_fk: patient.id,
         scale_fk: scale.id,
         answers: Object.entries(answers).map(([qid, iid]) => ({

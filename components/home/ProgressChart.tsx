@@ -103,7 +103,6 @@ export default function ProgressChart({ evaluations, scaleName }: ProgressChartP
   }, []);
 
   const visibleAreas = areas.filter(a => !hiddenAreas.has(a));
-  const isTotalHidden = hiddenAreas.has('total');
 
   return (
     <div className="space-y-6 animate-fade-in-up">
@@ -128,29 +127,6 @@ export default function ProgressChart({ evaluations, scaleName }: ProgressChartP
         <div className="p-4 sm:p-6">
           {/* Custom interactive legend */}
           <div className="flex flex-wrap gap-2 justify-center mb-4 px-2">
-            {/* Total score toggle */}
-            <button
-              type="button"
-              onClick={() => toggleArea('total')}
-              className="flex items-center gap-1.5 px-2.5 py-1.5 rounded-lg transition-all border text-[10px] font-bold uppercase tracking-wider"
-              style={{
-                backgroundColor: isTotalHidden ? 'transparent' : 'rgba(245,158,11,0.1)',
-                borderColor: isTotalHidden ? 'rgba(255,255,255,0.05)' : 'rgba(245,158,11,0.3)',
-                color: isTotalHidden ? 'rgba(255,255,255,0.25)' : '#F59E0B',
-                opacity: isTotalHidden ? 0.5 : 1,
-              }}
-            >
-              <div
-                className="w-4 h-0.5 rounded-full"
-                style={{
-                  backgroundColor: isTotalHidden ? 'rgba(255,255,255,0.2)' : '#F59E0B',
-                  borderTop: isTotalHidden ? 'none' : '2px dashed #F59E0B',
-                  height: 0,
-                }}
-              />
-              <span>Total</span>
-              {isTotalHidden ? <RiEyeOffLine size={10} /> : <RiEyeLine size={10} />}
-            </button>
 
             {areas.map((area, index) => {
               const isHidden = hiddenAreas.has(area);
@@ -162,15 +138,15 @@ export default function ProgressChart({ evaluations, scaleName }: ProgressChartP
                   onClick={() => toggleArea(area)}
                   className="flex items-center gap-1.5 px-2.5 py-1.5 rounded-lg transition-all border text-[10px] font-bold uppercase tracking-wider"
                   style={{
-                    backgroundColor: isHidden ? 'transparent' : `${color}10`,
-                    borderColor: isHidden ? 'rgba(255,255,255,0.05)' : `${color}30`,
-                    color: isHidden ? 'rgba(255,255,255,0.25)' : color,
-                    opacity: isHidden ? 0.5 : 1,
+                    backgroundColor: isHidden ? 'rgba(128, 128, 128, 0.1)' : `${color}10`,
+                    borderColor: isHidden ? 'rgba(128, 128, 128, 0.2)' : `${color}30`,
+                    color: isHidden ? '#888888' : color,
+                    opacity: isHidden ? 0.6 : 1,
                   }}
                 >
                   <div
                     className="w-2.5 h-2.5 rounded-full"
-                    style={{ backgroundColor: isHidden ? 'rgba(255,255,255,0.2)' : color }}
+                    style={{ backgroundColor: isHidden ? '#888888' : color }}
                   />
                   <span>{area}</span>
                   {isHidden ? <RiEyeOffLine size={10} /> : <RiEyeLine size={10} />}
@@ -220,29 +196,30 @@ export default function ProgressChart({ evaluations, scaleName }: ProgressChartP
                 labelStyle={{ color: 'rgba(255,255,255,0.4)', fontSize: '10px', marginBottom: '6px', fontWeight: 800, textTransform: 'uppercase', letterSpacing: '0.1em' }}
               />
 
-              {/* Area fills (behind lines) for visible domains */}
-              {visibleAreas.map((area, i) => {
-                const globalIndex = areas.indexOf(area);
+              {/* Area fills (behind lines) for all domains */}
+              {areas.map((area, index) => {
+                const isHidden = hiddenAreas.has(area);
                 return (
                   <Area
                     key={`area-${area}`}
                     type="monotone"
                     dataKey={area}
                     stroke="none"
-                    fill={`url(#gradient-${globalIndex})`}
-                    fillOpacity={1}
+                    fill={`url(#gradient-${index})`}
+                    fillOpacity={isHidden ? 0 : 1}
                     animationDuration={1200}
                     name={`_area_${area}`}
                     legendType="none"
                     tooltipType="none"
+                    hide={isHidden}
                   />
                 );
               })}
 
               {/* Domain lines */}
-              {visibleAreas.map((area) => {
-                const globalIndex = areas.indexOf(area);
-                const color = colors[globalIndex % colors.length];
+              {areas.map((area, index) => {
+                const isHidden = hiddenAreas.has(area);
+                const color = colors[index % colors.length];
                 return (
                   <Line
                     key={`line-${area}`}
@@ -254,24 +231,12 @@ export default function ProgressChart({ evaluations, scaleName }: ProgressChartP
                     activeDot={{ r: 5, strokeWidth: 0, fill: color }}
                     animationDuration={1200}
                     name={area}
+                    hide={isHidden}
                   />
                 );
               })}
 
-              {/* Total score line — dashed, prominent */}
-              {!isTotalHidden && (
-                <Line
-                  type="monotone"
-                  dataKey="total"
-                  stroke="#F59E0B"
-                  strokeWidth={2.5}
-                  strokeDasharray="6 4"
-                  dot={{ r: 3, fill: '#F59E0B', strokeWidth: 2, stroke: '#161622' }}
-                  activeDot={{ r: 5, strokeWidth: 0, fill: '#F59E0B' }}
-                  animationDuration={1200}
-                  name="Total"
-                />
-              )}
+
             </AreaChart>
           </ResponsiveContainer>
         </div>
