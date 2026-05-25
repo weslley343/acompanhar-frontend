@@ -347,9 +347,12 @@ export default function Navigation({ activeTab, onTabChange }: NavigationProps) 
 
         <button
           onClick={() => { logout(); router.push('/login'); }}
-          className="relative flex flex-col items-center justify-center text-red-500/40 hover:text-red-500 transition-all duration-300 w-full h-full group"
+          className="relative flex flex-col items-center justify-center gap-1 text-red-500/40 hover:text-red-500 transition-all duration-300 w-full h-full group"
         >
           <RiLogoutBoxLine size={24} className="group-active:scale-90 transition-transform" />
+          <span className="text-[10px] font-bold uppercase tracking-widest transition-all opacity-0 pointer-events-none select-none">
+            Sair
+          </span>
         </button>
       </nav>
     </>

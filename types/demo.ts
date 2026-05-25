@@ -7,6 +7,7 @@ export interface DemoCredentials {
 export interface DemoSummaryItem {
   scale: string;
   child: string;
+  associated_to_responsible?: boolean;
 }
 
 export interface DemoResponse {

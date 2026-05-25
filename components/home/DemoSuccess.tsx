@@ -155,15 +155,26 @@ Senha: ${data.credentials.responsible.password}
           <h3 className="font-bold text-white tracking-tight">O que foi gerado?</h3>
         </div>
 
-        <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
-          {data.summary.map((item, idx) => (
-            <div key={idx} className="flex items-center gap-3 p-4 bg-secondary/50 rounded-2xl border border-white/5">
-              <div className="flex flex-col min-w-0">
-                <span className="text-[10px] font-black uppercase tracking-widest text-primary/60 truncate">{item.scale}</span>
-                <span className="text-sm font-medium text-white/80 truncate">{item.child}</span>
+        <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+          {data.summary.map((item, idx) => {
+            const isShared = 'associated_to_responsible' in item ? item.associated_to_responsible : true;
+            return (
+              <div key={idx} className="flex items-center justify-between p-4 bg-secondary/50 rounded-2xl border border-white/5 gap-3">
+                <div className="flex flex-col min-w-0">
+                  <span className="text-[10px] font-black uppercase tracking-widest text-primary/60 truncate">{item.scale}</span>
+                  <span className="text-sm font-medium text-white/80 truncate">{item.child}</span>
+                </div>
+                <span className={cn(
+                  "shrink-0 px-2.5 py-1 rounded-full text-[8px] font-extrabold uppercase tracking-widest border",
+                  isShared 
+                    ? "bg-pink-500/10 text-pink-400 border-pink-500/20" 
+                    : "bg-primary/10 text-primary border-primary/20"
+                )}>
+                  {isShared ? "Compartilhado" : "Apenas Profissional"}
+                </span>
               </div>
-            </div>
-          ))}
+            );
+          })}
         </div>
       </div>
 
