@@ -312,16 +312,18 @@ export default function PatientHistory() {
                   </div>
                   
                   <div className="flex items-center gap-1.5 shrink-0">
-                    <button
-                      onClick={(e) => {
-                        e.stopPropagation();
-                        router.push(`/studio/analysis/${ev.id}?clientId=${ev.client_fk}&scaleId=${ev.scale_fk}`);
-                      }}
-                      className="p-2 bg-white/5 hover:bg-primary/10 hover:text-primary rounded-xl transition-all active:scale-95 z-20"
-                      title="Abrir no Studio"
-                    >
-                      <RiRocketLine size={16} />
-                    </button>
+                    {user?.role !== 'responsible' && (
+                      <button
+                        onClick={(e) => {
+                          e.stopPropagation();
+                          router.push(`/studio/analysis/${ev.id}?clientId=${ev.client_fk}&scaleId=${ev.scale_fk}`);
+                        }}
+                        className="p-2 bg-white/5 hover:bg-primary/10 hover:text-primary rounded-xl transition-all active:scale-95 z-20"
+                        title="Abrir no Studio"
+                      >
+                        <RiRocketLine size={16} />
+                      </button>
+                    )}
                     
                     {(user?.role === 'admin' || user?.id === ev.professional_fk) && (
                       <button

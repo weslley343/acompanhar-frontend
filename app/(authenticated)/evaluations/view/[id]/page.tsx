@@ -25,6 +25,7 @@ import { useAuthStore } from '@/lib/stores/store';
 export default function EvaluationView() {
   const { id } = useParams();
   const router = useRouter();
+  const { user } = useAuthStore();
 
   const [evaluation, setEvaluation] = useState<EvaluationResponse | null>(null);
   const [loading, setLoading] = useState(true);
@@ -175,28 +176,30 @@ export default function EvaluationView() {
         </section>
 
         {/* Studio CTA Section */}
-        <section className="animate-fade-in-up delay-100">
-          <button
-            onClick={() => {
-              router.push(`/studio/analysis/${evaluation.id}?clientId=${evaluation.client_fk}&scaleId=${evaluation.scale_fk}`);
-            }}
-            className="w-full p-8 bg-gradient-to-br from-primary/10 via-primary/5 to-transparent border border-primary/20 rounded-[2.5rem] flex flex-col md:flex-row items-center gap-6 group hover:border-primary/40 transition-all hover:shadow-[0_20px_40px_-15px_rgba(var(--primary-rgb),0.1)] active:scale-[0.98]"
-          >
-            <div className="w-20 h-20 bg-primary/20 rounded-3xl flex items-center justify-center text-primary group-hover:scale-110 group-hover:rotate-12 transition-all">
-              <RiRocketLine size={40} />
-            </div>
-            <div className="flex-1 text-center md:text-left space-y-1">
-              <p className="text-[10px] font-black text-primary uppercase tracking-[0.3em]">Ferramentas Avançadas</p>
-              <h3 className="text-2xl font-black text-white uppercase tracking-tighter">Explorar no Studio</h3>
-              <p className="text-white/40 text-sm max-w-sm mx-auto md:mx-0">
-                Crie e acesse insights baseados em inteligência coletiva e análise comparativa.
-              </p>
-            </div>
-            <div className="hidden md:flex w-12 h-12 bg-white/5 rounded-2xl items-center justify-center text-white/20 group-hover:bg-primary group-hover:text-secondary-dark transition-all">
-              <RiRocketLine size={20} />
-            </div>
-          </button>
-        </section>
+        {user?.role !== 'responsible' && (
+          <section className="animate-fade-in-up delay-100">
+            <button
+              onClick={() => {
+                router.push(`/studio/analysis/${evaluation.id}?clientId=${evaluation.client_fk}&scaleId=${evaluation.scale_fk}`);
+              }}
+              className="w-full p-8 bg-gradient-to-br from-primary/10 via-primary/5 to-transparent border border-primary/20 rounded-[2.5rem] flex flex-col md:flex-row items-center gap-6 group hover:border-primary/40 transition-all hover:shadow-[0_20px_40px_-15px_rgba(var(--primary-rgb),0.1)] active:scale-[0.98]"
+            >
+              <div className="w-20 h-20 bg-primary/20 rounded-3xl flex items-center justify-center text-primary group-hover:scale-110 group-hover:rotate-12 transition-all">
+                <RiRocketLine size={40} />
+              </div>
+              <div className="flex-1 text-center md:text-left space-y-1">
+                <p className="text-[10px] font-black text-primary uppercase tracking-[0.3em]">Ferramentas Avançadas</p>
+                <h3 className="text-2xl font-black text-white uppercase tracking-tighter">Explorar no Studio</h3>
+                <p className="text-white/40 text-sm max-w-sm mx-auto md:mx-0">
+                  Crie e acesse insights baseados em inteligência coletiva e análise comparativa.
+                </p>
+              </div>
+              <div className="hidden md:flex w-12 h-12 bg-white/5 rounded-2xl items-center justify-center text-white/20 group-hover:bg-primary group-hover:text-secondary-dark transition-all">
+                <RiRocketLine size={20} />
+              </div>
+            </button>
+          </section>
+        )}
 
         {/* Detailed Answers Section (Mirror View) flights */}
         {evaluation.answers && evaluation.answers.length > 0 && (

@@ -56,7 +56,17 @@ function StudioAnalysisContent() {
   const { id } = useParams();
   const searchParams = useSearchParams();
   const router = useRouter();
-  const { token: storeToken } = useAuthStore();
+  const { token: storeToken, user } = useAuthStore();
+
+  useEffect(() => {
+    if (user && user.role === 'responsible') {
+      router.replace('/403');
+    }
+  }, [user, router]);
+
+  if (!user || user.role === 'responsible') {
+    return null;
+  }
 
   // Fallback robusto para o localStorage (evita problemas de hidratação do Zustand)
   const token = storeToken || (typeof window !== 'undefined' ? localStorage.getItem('token') : null);

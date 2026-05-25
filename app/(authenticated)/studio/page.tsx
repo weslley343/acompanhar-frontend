@@ -1,5 +1,6 @@
 'use client';
 
+import { useEffect } from 'react';
 import { useRouter } from 'next/navigation';
 import { 
   RiRocketLine, 
@@ -9,9 +10,21 @@ import {
   RiLineChartLine,
   RiMagicLine
 } from 'react-icons/ri';
+import { useAuthStore } from '@/lib/stores/store';
 
 export default function StudioPage() {
   const router = useRouter();
+  const { user } = useAuthStore();
+
+  useEffect(() => {
+    if (user && user.role === 'responsible') {
+      router.replace('/403');
+    }
+  }, [user, router]);
+
+  if (!user || user.role === 'responsible') {
+    return null;
+  }
 
   const upcomingFeatures = [
     {
