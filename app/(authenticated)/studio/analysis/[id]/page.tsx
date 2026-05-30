@@ -1,6 +1,6 @@
 'use client';
 
-import { useEffect, useState, useRef } from 'react';
+import { useEffect, useState, useRef, useMemo } from 'react';
 import { useParams, useRouter, useSearchParams } from 'next/navigation';
 import {
   RiRocketLine,
@@ -22,6 +22,16 @@ import { Suspense } from 'react';
 import { cn } from '@/lib/utils';
 import { evaluationService } from '@/lib/api/evaluations';
 import { scaleService } from '@/lib/api/scales';
+import {
+  BarChart,
+  Bar,
+  Cell,
+  XAxis,
+  YAxis,
+  CartesianGrid,
+  Tooltip,
+  ResponsiveContainer
+} from 'recharts';
 
 interface Recommendation {
   questionid: number;
@@ -124,6 +134,39 @@ function StudioAnalysisContent() {
       logEndRef.current.scrollIntoView({ behavior: 'smooth' });
     }
   }, [state.logs]);
+
+  const [activeTab, setActiveTab] = useState<'list' | 'chart'>('list');
+
+  const groupedData = useMemo(() => {
+    const domains: Record<string, { name: string; count: number; totalIntensity: number; avgIntensity: number; color: string; items: Recommendation[] }> = {};
+
+    state.recommendations.forEach(rec => {
+      const domainName = rec.domain || 'Geral / Outros';
+      const color = rec.color || '#3b82f6';
+      const positiveIntensity = Math.abs(rec.intensity_score || 0);
+      if (!domains[domainName]) {
+        domains[domainName] = {
+          name: domainName,
+          count: 0,
+          totalIntensity: 0,
+          avgIntensity: 0,
+          color,
+          items: []
+        };
+      }
+      domains[domainName].count += 1;
+      domains[domainName].totalIntensity += positiveIntensity;
+      domains[domainName].items.push({
+        ...rec,
+        intensity_score: positiveIntensity
+      });
+    });
+
+    return Object.values(domains).map(d => ({
+      ...d,
+      avgIntensity: parseFloat((d.totalIntensity / d.count).toFixed(2))
+    }));
+  }, [state.recommendations]);
 
   const [expandedQuestions, setExpandedQuestions] = useState<Record<number, boolean>>({});
   const [questionDetails, setQuestionDetails] = useState<Record<number, any>>({});
@@ -408,11 +451,11 @@ function StudioAnalysisContent() {
   };
 
   return (
-    <div 
+    <div
       className="min-h-screen text-white flex flex-col pb-12 studio-page-bg"
     >
       {/* Header */}
-      <header 
+      <header
         className="h-20 flex items-center px-6 border-b border-white/5 sticky top-0 z-50 studio-header-bg"
       >
         <div className="max-w-4xl w-full mx-auto flex items-center gap-4">
@@ -698,120 +741,364 @@ function StudioAnalysisContent() {
 
         {state.status === 'completed' && (
           <section className="space-y-6 animate-fade-in">
-            <div className="flex items-center justify-between px-2">
+            <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4 px-2">
               <div className="flex items-center gap-3 text-primary">
                 <RiBrainLine size={24} />
                 <h3 className="text-lg font-black uppercase tracking-tighter">Sugestões de Foco Clínico</h3>
               </div>
-              <span className="px-3 py-1 bg-white/5 text-card-identifier text-[10px] font-black rounded-full uppercase tracking-widest border border-white/5">
+              <span className="px-3 py-1 bg-white/5 text-card-identifier text-[10px] font-black rounded-full uppercase tracking-widest border border-white/5 self-start sm:self-auto">
                 Top {state.recommendations.length} Prioridades
               </span>
             </div>
 
-            <div className="grid grid-cols-1 gap-4">
-              {state.recommendations.map((rec, idx) => {
-                const cardColor = rec.color || '#3b82f6';
-                return (
-                  <div key={idx}
-                    onClick={() => toggleExpandQuestion(rec.questionid)}
-                    className="group bg-tertiary border border-white/5 hover:border-primary/20 rounded-[2rem] p-6 transition-all duration-300 flex flex-col relative overflow-hidden cursor-pointer active:scale-[0.99] select-none hover:shadow-lg hover:shadow-primary/5"
-                    style={{ borderLeftColor: cardColor }}
-                  >
-                    <div 
-                      className="absolute top-0 left-0 w-1.5 h-full opacity-40 group-hover:opacity-100 transition-opacity" 
-                      style={{ backgroundColor: cardColor }}
-                    />
+            {/* Tab Bar */}
+            <div className="flex bg-white/5 p-1 rounded-2xl border border-white/5 max-w-md w-full">
+              <button
+                onClick={() => setActiveTab('list')}
+                className={cn(
+                  "flex-1 py-3 px-4 rounded-xl font-black text-xs uppercase tracking-wider flex items-center justify-center gap-2 transition-all duration-300",
+                  activeTab === 'list'
+                    ? "bg-primary text-secondary-dark shadow-lg shadow-primary/10"
+                    : "text-white/60 hover:text-white hover:bg-white/5"
+                )}
+              >
+                <RiListSettingsLine size={18} />
+                Lista de Prioridades
+              </button>
+              <button
+                onClick={() => setActiveTab('chart')}
+                className={cn(
+                  "flex-1 py-3 px-4 rounded-xl font-black text-xs uppercase tracking-wider flex items-center justify-center gap-2 transition-all duration-300",
+                  activeTab === 'chart'
+                    ? "bg-primary text-secondary-dark shadow-lg shadow-primary/10"
+                    : "text-white/60 hover:text-white hover:bg-white/5"
+                )}
+              >
+                <RiBarChartLine size={18} />
+                Visão por Área
+              </button>
+            </div>
 
-                    {/* Main Row */}
-                    <div className="flex items-center gap-6">
-                      {/* Ranking badge/item with universal border stroke and dark text outline */}
-                      <div 
-                        className="w-14 h-14 rounded-2xl bg-secondary flex items-center justify-center shrink-0 transition-transform duration-300 group-hover:scale-105 border border-slate-200 dark:border-white/10"
-                        style={{ color: cardColor }}
-                      >
-                        <span 
-                          className="text-xl font-black"
-                          style={{
-                            WebkitTextStroke: '1px #475569'
-                          }}
+            {/* List Tab Content */}
+            {activeTab === 'list' && (
+              <div className="grid grid-cols-1 gap-4 animate-fade-in">
+                {state.recommendations.map((rec, idx) => {
+                  const cardColor = rec.color || '#3b82f6';
+                  return (
+                    <div key={idx}
+                      onClick={() => toggleExpandQuestion(rec.questionid)}
+                      className="group bg-tertiary border border-white/5 hover:border-primary/20 rounded-[2rem] p-6 transition-all duration-300 flex flex-col relative overflow-hidden cursor-pointer active:scale-[0.99] select-none hover:shadow-lg hover:shadow-primary/5"
+                      style={{ borderLeftColor: cardColor }}
+                    >
+                      <div
+                        className="absolute top-0 left-0 w-1.5 h-full opacity-40 group-hover:opacity-100 transition-opacity"
+                        style={{ backgroundColor: cardColor }}
+                      />
+
+                      {/* Main Row */}
+                      <div className="flex items-center gap-6">
+                        {/* Ranking badge/item with universal border stroke and dark text outline */}
+                        <div
+                          className="w-14 h-14 rounded-2xl bg-secondary flex items-center justify-center shrink-0 transition-transform duration-300 group-hover:scale-105 border border-slate-200 dark:border-white/10"
+                          style={{ color: cardColor }}
                         >
-                          #{idx + 1}
-                        </span>
-                      </div>
-
-                      <div className="flex-1 min-w-0">
-                        <p className="text-[10px] font-black text-card-code uppercase tracking-widest mb-1">
-                          {rec.domain ? `${rec.domain} • ` : ''}Questão ID: {rec.questionid}
-                        </p>
-                        <h4 className="text-base font-bold text-white group-hover:text-primary transition-colors leading-tight">
-                          {rec.content || `Questão #${rec.questionid}`}
-                        </h4>
-                      </div>
-
-                      <div className="flex items-center shrink-0">
-                        {/* Expand Arrow Indicator */}
-                        <div 
-                          className={cn(
-                            "w-8 h-8 rounded-xl bg-white/5 border border-white/5 flex items-center justify-center text-card-identifier transition-all duration-300 group-hover:text-white group-hover:bg-white/10",
-                            expandedQuestions[rec.questionid] && "rotate-90 border-primary/20"
-                          )}
-                          style={expandedQuestions[rec.questionid] ? { 
-                            color: cardColor, 
-                            backgroundColor: `${cardColor}15`, 
-                            borderColor: `${cardColor}30` 
-                          } : {}}
-                        >
-                          <RiArrowRightSLine size={20} />
+                          <span
+                            className="text-xl font-black"
+                            style={{
+                              WebkitTextStroke: '1px #475569'
+                            }}
+                          >
+                            #{idx + 1}
+                          </span>
                         </div>
+
+                        <div className="flex-1 min-w-0">
+                          <p className="text-[10px] font-black text-card-code uppercase tracking-widest mb-1">
+                            {rec.domain ? `${rec.domain} • ` : ''}Questão ID: {rec.questionid}
+                          </p>
+                          <h4 className="text-base font-bold text-white group-hover:text-primary transition-colors leading-tight">
+                            {rec.content || `Questão #${rec.questionid}`}
+                          </h4>
+                        </div>
+
+                        <div className="flex items-center shrink-0">
+                          {/* Expand Arrow Indicator */}
+                          <div
+                            className={cn(
+                              "w-8 h-8 rounded-xl bg-white/5 border border-white/5 flex items-center justify-center text-card-identifier transition-all duration-300 group-hover:text-white group-hover:bg-white/10",
+                              expandedQuestions[rec.questionid] && "rotate-90 border-primary/20"
+                            )}
+                            style={expandedQuestions[rec.questionid] ? {
+                              color: cardColor,
+                              backgroundColor: `${cardColor}15`,
+                              borderColor: `${cardColor}30`
+                            } : {}}
+                          >
+                            <RiArrowRightSLine size={20} />
+                          </div>
+                        </div>
+                      </div>
+
+                      {/* Collapsible Clinical Answer Options */}
+                      {expandedQuestions[rec.questionid] && (
+                        <div
+                          onClick={(e) => e.stopPropagation()} // Prevent closing when interacting inside details
+                          className="mt-4 pt-4 border-t border-white/5 space-y-3 animate-fade-in select-text"
+                        >
+                          <p className="text-[10px] font-black text-primary uppercase tracking-[0.15em] flex items-center gap-1.5">
+                            <RiListSettingsLine size={14} />
+                            <span>Opções de Resposta e Pontuação no Formulário</span>
+                          </p>
+
+                          {loadingQuestionId === rec.questionid ? (
+                            <div className="flex items-center gap-2 py-2 text-xs text-card-code animate-pulse">
+                              <RiLoader4Line className="animate-spin" size={14} />
+                              <span>Buscando alternativas na base clínica principal...</span>
+                            </div>
+                          ) : (
+                            <div className="grid grid-cols-1 gap-2">
+                              {questionDetails[rec.questionid]?.itens?.map((item: any) => (
+                                <div key={item.id} className="flex items-center justify-between gap-4 p-3.5 bg-secondary/40 border border-white/5 rounded-xl hover:border-white/10 hover:bg-secondary/65 transition-all">
+                                  <div className="flex items-start gap-2.5">
+                                    <span className="w-5 h-5 rounded bg-white/5 flex items-center justify-center font-black text-card-identifier text-[10px] shrink-0 border border-white/5">
+                                      {item.item_order}
+                                    </span>
+                                    <span className="text-xs font-semibold text-white leading-normal">{item.content}</span>
+                                  </div>
+                                  <span className="px-2.5 py-1 bg-white/5 border border-white/10 rounded-full font-black text-primary text-[10px] leading-none shrink-0 shadow-inner">
+                                    Pontuação: {parseFloat(item.score).toFixed(1)}
+                                  </span>
+                                </div>
+                              ))}
+                              {(!questionDetails[rec.questionid]?.itens || questionDetails[rec.questionid]?.itens.length === 0) && (
+                                <p className="text-xs text-card-code italic py-2">Nenhuma alternativa cadastrada para esta questão.</p>
+                              )}
+                            </div>
+                          )}
+                        </div>
+                      )}
+                    </div>
+                  );
+                })}
+              </div>
+            )}
+
+            {/* Chart Tab Content */}
+            {activeTab === 'chart' && (
+              <div className="space-y-6 animate-fade-in">
+                {/* Chart Container Card */}
+                <div className="bg-tertiary border border-white/5 rounded-[2.5rem] p-6 relative overflow-hidden">
+                  <div className="absolute inset-0 overflow-hidden rounded-[2.5rem] pointer-events-none">
+                    <div className="absolute top-0 right-0 w-64 h-64 bg-primary/5 blur-[120px]" />
+                  </div>
+
+                  <div className="relative space-y-4">
+                    <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4">
+                      <div>
+                        <h4 className="text-sm font-black text-white uppercase tracking-wider">Intensidade Média por Área</h4>
+                        <p className="text-[10px] text-card-code font-bold uppercase tracking-widest mt-1">Comparativo de prioridade clínica acumulada</p>
+                      </div>
+                      <div className="text-left">
+                        <span className="text-xs font-black text-primary bg-primary/10 px-3 py-1 rounded-xl uppercase tracking-widest">
+                          {groupedData.length} {groupedData.length === 1 ? 'Área Identificada' : 'Áreas Identificadas'}
+                        </span>
                       </div>
                     </div>
 
-                    {/* Collapsible Clinical Answer Options */}
-                    {expandedQuestions[rec.questionid] && (
-                      <div
-                        onClick={(e) => e.stopPropagation()} // Prevent closing when interacting inside details
-                        className="mt-4 pt-4 border-t border-white/5 space-y-3 animate-fade-in select-text"
-                      >
-                        <p className="text-[10px] font-black text-primary uppercase tracking-[0.15em] flex items-center gap-1.5">
-                          <RiListSettingsLine size={14} />
-                          <span>Opções de Resposta e Pontuação no Formulário</span>
-                        </p>
+                    <div className="w-full pt-4 min-w-0">
+                      <ResponsiveContainer width="100%" height={280} minWidth={0}>
+                        <BarChart data={groupedData} margin={{ top: 20, right: 10, left: -20, bottom: 10 }}>
+                          <CartesianGrid strokeDasharray="3 3" vertical={false} stroke="rgba(255,255,255,0.05)" />
+                          <XAxis
+                            dataKey="name"
+                            hide={true}
+                          />
+                          <YAxis
+                            axisLine={false}
+                            tickLine={false}
+                            tick={{ fill: 'var(--card-code)', fontSize: 11, fontWeight: 900 }}
+                            dx={-5}
+                          />
+                          <Tooltip
+                            contentStyle={{
+                              backgroundColor: '#161622',
+                              border: '1px solid rgba(255,255,255,0.2)',
+                              borderRadius: '16px',
+                              padding: '12px 16px',
+                              boxShadow: '0 25px 50px -12px rgba(0,0,0,0.5)',
+                            }}
+                            cursor={{ fill: 'rgba(255,255,255,0.05)' }}
+                            labelStyle={{ color: 'var(--card-identifier)', fontSize: '11px', fontWeight: 900, textTransform: 'uppercase', letterSpacing: '0.15em', marginBottom: '6px' }}
+                            itemStyle={{ color: '#00F2FF', fontSize: '12px', fontWeight: 900, padding: '2px 0' }}
+                            formatter={(value: any, name: any) => {
+                              if (name === 'avgIntensity') return [`${value} pts`, 'Intensidade Média'];
+                              if (name === 'count') return [`${value} focos`, 'Focos de Intervenção'];
+                              return [value, name];
+                            }}
+                          />
+                          <Bar dataKey="avgIntensity" radius={[8, 8, 0, 0]} maxBarSize={50} animationDuration={1000}>
+                            {groupedData.map((entry, index) => (
+                              <Cell key={`cell-${index}`} fill={entry.color} fillOpacity={0.95} />
+                            ))}
+                          </Bar>
+                        </BarChart>
+                      </ResponsiveContainer>
+                    </div>
 
-                        {loadingQuestionId === rec.questionid ? (
-                          <div className="flex items-center gap-2 py-2 text-xs text-card-code animate-pulse">
-                            <RiLoader4Line className="animate-spin" size={14} />
-                            <span>Buscando alternativas na base clínica principal...</span>
+                    {/* Custom Premium Color Legend for Mobile-First Display */}
+                    <div className="flex flex-wrap gap-2.5 justify-center pt-4 border-t border-white/5">
+                      {groupedData.map((entry, index) => {
+                        const areaColor = entry.color;
+                        return (
+                          <div
+                            key={index}
+                            className="flex items-center gap-2 px-3 py-1.5 rounded-xl border border-slate-900/15 dark:border-white/10 text-xs font-black uppercase tracking-wider transition-all duration-300 text-white shadow-sm"
+                            style={{
+                              backgroundColor: `${areaColor}12`
+                            }}
+                          >
+                            <div
+                              className="w-2.5 h-2.5 rounded-full shrink-0 animate-pulse border border-slate-900/20 dark:border-black/40"
+                              style={{
+                                backgroundColor: areaColor,
+                                boxShadow: `0 0 8px ${areaColor}90`
+                              }}
+                            />
+                            <span>{entry.name}</span>
+                            <span
+                              className="px-1.5 py-0.5 rounded-md font-black text-[10px] select-none ml-1 bg-slate-900/5 dark:bg-white/5 border border-slate-900/15 dark:border-white/10"
+                              style={{ 
+                                color: areaColor,
+                                WebkitTextStroke: '0.6px var(--secondary-dark)'
+                              }}
+                            >
+                              {entry.avgIntensity} pts
+                            </span>
                           </div>
-                        ) : (
-                          <div className="grid grid-cols-1 gap-2">
-                            {questionDetails[rec.questionid]?.itens?.map((item: any) => (
-                              <div key={item.id} className="flex items-center justify-between gap-4 p-3.5 bg-secondary/40 border border-white/5 rounded-xl hover:border-white/10 hover:bg-secondary/65 transition-all">
-                                <div className="flex items-start gap-2.5">
-                                  <span className="w-5 h-5 rounded bg-white/5 flex items-center justify-center font-black text-card-identifier text-[10px] shrink-0 border border-white/5">
-                                    {item.item_order}
-                                  </span>
-                                  <span className="text-xs font-semibold text-white leading-normal">{item.content}</span>
+                        );
+                      })}
+                    </div>
+                  </div>
+                </div>
+
+                {/* Domain Breakdown Section */}
+                <div className="space-y-4">
+                  <div className="px-2">
+                    <p className="text-[10px] font-black text-primary uppercase tracking-[0.2em]">Detalhamento por Área</p>
+                    <h3 className="text-lg font-black uppercase tracking-tighter">Itens Recomendados Agrupados</h3>
+                  </div>
+
+                  <div className="grid grid-cols-1 gap-4">
+                    {groupedData.map((domain, dIdx) => {
+                      const domainColor = domain.color;
+                      return (
+                        <div
+                          key={dIdx}
+                          className="bg-tertiary border border-white/5 rounded-[2rem] p-6 relative overflow-hidden"
+                          style={{ borderLeft: `6px solid ${domainColor}` }}
+                        >
+                          {/* Domain Header */}
+                          <div className="flex items-center justify-between mb-4 pb-4 border-b border-white/5">
+                            <div>
+                              <h4 className="text-base font-black text-white uppercase tracking-tight">{domain.name}</h4>
+                              <p className="text-[10px] text-card-code font-bold uppercase tracking-widest mt-1">
+                                {domain.count} {domain.count === 1 ? 'item recomendado' : 'itens recomendados'}
+                              </p>
+                            </div>
+                            <div className="flex items-center gap-2">
+                              <span
+                                className="text-[10px] font-black px-3 py-1.5 rounded-xl uppercase tracking-widest"
+                                style={{ backgroundColor: `${domainColor}15`, color: domainColor, border: `1px solid ${domainColor}25` }}
+                              >
+                                Média: {domain.avgIntensity} pts
+                              </span>
+                            </div>
+                          </div>
+
+                          {/* Items in Domain */}
+                          <div className="space-y-3">
+                            {domain.items.map((rec, rIdx) => (
+                              <div
+                                key={rIdx}
+                                onClick={() => toggleExpandQuestion(rec.questionid)}
+                                className="group/sub bg-secondary/30 border border-white/5 hover:border-primary/20 rounded-2xl p-4 transition-all duration-300 flex flex-col cursor-pointer hover:bg-secondary/40 select-none"
+                              >
+                                <div className="flex items-center justify-between gap-4">
+                                  <div className="flex-1 min-w-0">
+                                    <div className="flex items-center gap-2">
+                                      <span className="text-[9px] font-black text-card-code bg-white/5 px-2 py-0.5 rounded-md uppercase tracking-wider">ID: {rec.questionid}</span>
+                                      <span className="text-[9px] font-black text-primary uppercase tracking-wider">Intensidade: {rec.intensity_score}</span>
+                                    </div>
+                                    <p className="text-xs font-bold text-white group-hover/sub:text-primary transition-colors leading-relaxed mt-2">
+                                      {rec.content || `Questão #${rec.questionid}`}
+                                    </p>
+                                  </div>
+
+                                  <div
+                                    className={cn(
+                                      "w-7 h-7 rounded-lg bg-white/5 border border-white/5 flex items-center justify-center text-card-identifier transition-all duration-300 group-hover/sub:text-white group-hover/sub:bg-white/10",
+                                      expandedQuestions[rec.questionid] && "rotate-90 border-primary/20"
+                                    )}
+                                    style={expandedQuestions[rec.questionid] ? {
+                                      color: domainColor,
+                                      backgroundColor: `${domainColor}15`,
+                                      borderColor: `${domainColor}30`
+                                    } : {}}
+                                  >
+                                    <RiArrowRightSLine size={16} />
+                                  </div>
                                 </div>
-                                <span className="px-2.5 py-1 bg-white/5 border border-white/10 rounded-full font-black text-primary text-[10px] leading-none shrink-0 shadow-inner">
-                                  Pontuação: {parseFloat(item.score).toFixed(1)}
-                                </span>
+
+                                {/* Collapsible clinical answers */}
+                                {expandedQuestions[rec.questionid] && (
+                                  <div
+                                    onClick={(e) => e.stopPropagation()}
+                                    className="mt-3 pt-3 border-t border-white/5 space-y-2 select-text"
+                                  >
+                                    {loadingQuestionId === rec.questionid ? (
+                                      <div className="flex items-center gap-2 py-2 text-[10px] text-card-code animate-pulse">
+                                        <RiLoader4Line className="animate-spin" size={12} />
+                                        <span>Buscando alternativas na base clínica principal...</span>
+                                      </div>
+                                    ) : (
+                                      <div className="grid grid-cols-1 gap-1.5">
+                                        {questionDetails[rec.questionid]?.itens?.map((item: any) => (
+                                          <div key={item.id} className="flex items-center justify-between gap-3 p-2.5 bg-secondary/50 border border-white/5 rounded-lg hover:border-white/10 transition-all">
+                                            <div className="flex items-start gap-2">
+                                              <span className="w-4 h-4 rounded bg-white/5 flex items-center justify-center font-black text-card-identifier text-[9px] shrink-0 border border-white/5">
+                                                {item.item_order}
+                                              </span>
+                                              <span className="text-[11px] font-semibold text-white/90 leading-tight">{item.content}</span>
+                                            </div>
+                                            <span className="px-2 py-0.5 bg-white/5 border border-white/10 rounded-full font-black text-primary text-[9px] leading-none shrink-0 shadow-inner">
+                                              Pontuação: {parseFloat(item.score).toFixed(1)}
+                                            </span>
+                                          </div>
+                                        ))}
+                                        {(!questionDetails[rec.questionid]?.itens || questionDetails[rec.questionid]?.itens.length === 0) && (
+                                          <p className="text-[10px] text-card-code italic py-1">Nenhuma alternativa cadastrada para esta questão.</p>
+                                        )}
+                                      </div>
+                                    )}
+                                  </div>
+                                )}
                               </div>
                             ))}
-                            {(!questionDetails[rec.questionid]?.itens || questionDetails[rec.questionid]?.itens.length === 0) && (
-                              <p className="text-xs text-card-code italic py-2">Nenhuma alternativa cadastrada para esta questão.</p>
-                            )}
                           </div>
-                        )}
-                      </div>
-                    )}
+                        </div>
+                      );
+                    })}
                   </div>
-                );
-              })}
-            </div>
+                </div>
+              </div>
+            )}
 
             <div className="pt-4 flex flex-col md:flex-row gap-4">
               <button
-                onClick={() => setState(prev => ({ ...prev, status: 'idle', step: 'fetching_answers', recommendations: [] }))}
+                onClick={() => {
+                  setActiveTab('list');
+                  setState(prev => ({ ...prev, status: 'idle', step: 'fetching_answers', recommendations: [] }));
+                }}
                 className="flex-1 py-4 bg-white/5 hover:bg-white/10 text-white font-black rounded-2xl transition-all border border-white/5"
               >
                 NOVA ANÁLISE
@@ -865,7 +1152,7 @@ function StudioAnalysisContent() {
 export default function StudioAnalysis() {
   return (
     <Suspense fallback={
-      <div 
+      <div
         className="min-h-screen flex flex-col items-center justify-center studio-page-bg"
       >
         <RiLoader4Line className="text-primary animate-spin" size={40} />
